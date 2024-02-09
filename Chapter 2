@@ -1,1 +1,101 @@
+We’ll take available financial data and transform it into visual narratives that give you an 
+at-a-glance understanding of how Apple measures up against its competitors. We’ll examine 
+historical stock data for Apple, Google, and Microsoft and use this to create Power BI 
+visualizations that bring the data to life.
 
+In the following steps, we will show how to install the necessary packages in Python, pull data 
+from different locations, extract relevant information, and build a Power BI dashboard.
+1. Step 1 – installing the necessary Python libraries
+
+In this step, we must set up the necessary Python libraries:
+Tip
+
+Libraries in Python are collections of modules that provide specific functionalities, making our 
+programming tasks easier. We’ll be using pandas for data manipulation and analysis, yfinance to 
+download Yahoo! Finance data, requests to send HTTP requests, and BeautifulSoup to extract data 
+from HTML and XML files. By installing these libraries, we can prepare our Python environment for 
+the subsequent data extraction and analysis tasks.
+pip install pandas pip install yfinance
+
+Here’s a Python code snippet that uses the yfinance library to download historical stock data for 
+Apple, Google, and Microsoft. The yfinance library is a convenient tool that allows you to access 
+Yahoo! Finance’s historical stock price data. You can use the following code to download the data:
+
+import yfinance as yf import pandas as pd
+# Define the ticker symbols tickers = ['AAPL', 'GOOG', 'MSFT']
+
+# Define the start and end dates start_date = '2020-01-01'
+end_date = '2022-12-31'
+# Create an empty DataFrame to store the data data = pd.DataFrame()
+# Download the data for ticker in tickers:
+df = yf.download(ticker, start=start_date, end=end_date, interval='1mo')
+df['Ticker'] = ticker # Add a column with the ticker symbol
+
+Walk-through use case – analyzing financial data using Power BI  19
+data = pd.concat([data, df])
+
+# Reset the index data.reset_index(inplace=True)
+# Save the data to a CSV file data.to_csv('stock_data.csv', index=False)
+Here’s a step-by-step breakdown:
+•  Import the necessary libraries: The script starts by importing the necessary Python libraries –
+yfinance for downloading stock data from Yahoo! Finance and pandas for data manipulation.
+•  Define ticker symbols: The ticker symbols for the stocks of interest are defined in a list – 
+AAPL
+for Apple, GOOG for Google, and MSFT for Microsoft.
+•  Define the date range: The start and end dates for the historical data are defined as 2020- 
+01-01 and 2022-12-31, respectively.
+•  Create an empty DataFrame: An empty pandas DataFrame is created to store the downloaded data.
+•  Download the data: The script then loops over each ticker symbol in the list, downloads the 
+monthly stock data for the defined date range using the yf.download() function, adds a new column 
+to the downloaded data to store the ticker symbol, and appends this data to the main DataFrame.
+•  Reset the index: The index of the main DataFrame is reset using the reset_index() function. This 
+is done because when new DataFrames are concatenated, pandas keeps the original indices. Resetting 
+the index ensures that we have a continuous index in the final DataFrame.
+• Save the data to a CSV file: Finally, the consolidated stock data is saved to a CSV file named 
+stock_data.csv using the to_csv() function. The index=False argument is used to prevent pandas      
+    n in the CSV file.
+
+Now, we must call the ChatGPT API from Power BI. Here, we will integrate ChatGPT with Power BI 
+using the Power Query Editor in Power BI and writing an executable Python code. The code is as 
+follows:
+
+I.  To start, import the necessary Python libraries:
+# 'dataset' holds the input data for this script # Import Libraries
+import openai import os
+
+II.  Next, add your Open AI key to the code:
+# Get Open AI API from windows environment openai.api_key = "Your Open AI API Key"
+
+III.  To pass data to the API, loop through each row of the dataset and create a single string:
+# Loop through each row in dataset & concatenate the data into a single string. Pass resulting 
+string to the API
+for index,row in dataset.iterrows():
+messages="I am going to give you a set of company information in the following order Company,Price 
+to Earnings,Price to Book,Return on Equity %,Debt to Equity,Current Ratio,Gross Margin %,analyze 
+the ratios for each company, refer to the company by its name and write a concise response"
+message = ''.join ([str(col) for col in row])
+
+IV.  Now, build the API request so that it includes the row-level data and makes a chat completion 
+request for the API. Once we’ve done this, we can process the response and write it back to the 
+report:
+#Build the API request to include row level data from source messages += " " + str(message)
+#Make a chat completion Request for the API chat = openai.ChatCompletion.create(
+model = "gpt-3.5-turbo",
+messages = [{"role":"user","content":messages}], temperature = 0.9,
+max_tokens = 500,
+top_p = 1,
+
+Walk-through use case – analyzing financial ratios using Power BI and ChatGPT  25
+frequency_penalty = 0,
+presence_penalty = 0.6
+)
+#Process the response from API
+reply = chat.choices[0].message.content
+
+#Write the response Back to the Report dataset.at[index, "reslt"] = reply
+
+When we run this script, the Python code loops through each row of the Power BI table and uses the 
+report data to construct the prompt for ChatGPT. This prompt is passed to ChatGPT with the API 
+response being written back to the Power BI DataFrame and table one row (company) at a time.
+Keep in mind that the dataset is a built-in pandas DataFrame-like structure that allows the Power 
+BI developer to access and manipulate data from the Power BI table using Python.
