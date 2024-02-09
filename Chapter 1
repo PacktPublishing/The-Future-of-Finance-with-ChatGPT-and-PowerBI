@@ -1,1 +1,300 @@
-Chapter-1
+ChatGPT for financial analysis – analyzing earnings
+reports for Palo Alto Networks
+
+In this section, we will explore an interesting example of how ChatGPT can be used to analyze and 
+summarize earnings reports, enabling you to identify key insights and trends quickly. With the vast 
+amount of information available in earnings reports, it can be challenging to sift through data and 
+identify the most critical elements. Let’s see how ChatGPT can help.
+
+Here’s the scenario – Palo Alto Networks has just released its quarterly earnings report. You want 
+to understand the company’s financial performance and identify any trends or potential issues that 
+may impact the stock price or investment potential:
+
+Step 1 – extract key data points:
+To get started, provide ChatGPT with the relevant earnings report data, such as revenue, net 
+income, EPS, and any other important metrics. Be sure to include both current and historical data 
+for comparison purposes. You can either input this data manually or automate the process using an 
+API or web scraper. Let’s explore the automated process to add Palo Alto Networks’ financial 
+information
+from September 2021 to March 2023 to ChatGPT.
+
+Step 1.1 – automating data collection with Python and API/web scraping:
+
+1. Choose a financial API or web scraping library in Python:
+• If using an API, explore options such as Alpha Vantage (alphavantage.co):
+• Obtain an API key from the Alpha Vantage website (free and paid versions).
+• Choose a method – Python requests.
+• Make a request.
+• If web scraping, use libraries such as Requests and Beautiful Soup
+• For web scraping, identify the URLs of the company’s financial statements or earnings reports 
+from websites such as Yahoo Finance (finance.yahoo.com), Nasdaq (nasdaq. com), or the company’s 
+investor relations page.
+
+2. Set up your Python script for data collection:
+• For APIs: a. Import the necessary libraries (e.g., requests or pandas) – for example, import 
+requests import pandas as pd. b. Define the API key, endpoint URL, and required parameters. c. Make 
+a request to the API to fetch data using the requests library. d. Parse the response data and 
+convert it into a pandas DataFrame.
+• For web scraping: a. Import the necessary libraries (e.g., requests, BeautifulSoup, or pandas) – 
+for example, import requests from bs4 import BeautifulSoup import pandas as pd. b. Define the 
+URL(s) containing the financial data. c. Use the requests library to fetch the HTML content of the 
+web page. d. Parse the HTML content using BeautifulSoup to extract the required financial data. e. 
+Convert the extracted data into a pandas DataFrame.
+
+3.  Collect historical data from September 2021 to March 2023 for the relevant financial metrics:
+• Adjust the parameters in your API request or web scraping script to target the specified date 
+range.
+
+4.  Save the collected data in a structured format, such as a CSV file or a pandas DataFrame, for 
+further processing and analysis:
+• Use pandas’ DataFrame.to_csv() method to save the collected data as a CSV file
+• Alternatively, keep the data in a pandas DataFrame for further analysis within the Python script.
+With these additions, you should have a better understanding of where to obtain financial data and 
+the necessary Python libraries to import for their data collection scripts.
+
+We will now provide a step-by-step guide using Python code for Palo Alto Networks’ financial data.
+Extract Palo Alto Networks’ quarterly financial data (revenue, net income, and EPS) for the time 
+period September 2021–March 2023, and save it in a CSV file as text input, using the Alpha Vantage 
+API key (finance website):
+
+1. Install the necessary Python package and pandas library in Command Prompt:
+pip install requests pip install pandas
+
+2.  Create a new Python script file in Notepad, Notepad++, PyCharm, or Visual Studio code. It is 
+important that you add your Alpha Vantage API key in the following api_key line. Copy and paste the 
+following code into your Python script file, and name it PANW.py:
+
+import requests import pandas as pd
+api_key = "YOUR_API_KEY" symbol = "PANW"
+url = f"https://www.alphavantage.co/ query?function=EARNINGS&symbol={symbol}&apikey={api_key}"
+try:
+
+response = requests.get(url)
+response.raise_for_status() # Raise HTTPError for bad responses
+data = response.json()
+if 'quarterlyEarnings' in data:
+quarterly_data = data['quarterlyEarnings'] df = pd.DataFrame(quarterly_data)
+
+df_filtered = df[(df['reportedDate'] >= '2021-09-01') & (df['reportedDate'] <= '2023-03-31')]
+
+df_filtered.to_csv("palo_alto_financial_data.csv", index=False)
+
+input_text = "Analyze the earnings data of Palo Alto Networks from September 2021 to March 
+2023.\n\n"
+for idx, row in df_filtered.iterrows(): quarter = idx + 1
+revenue = row.get('revenue', 'N/A') net_income = row.get('netIncome', 'N/A') eps = 
+row.get('earningsPerShare', 'N/A') input_text += f"Quarter {quarter}:\n" input_text += f"Revenue: 
+${revenue}\n"
+
+input_text += f"Net Income: ${net_income}\n" input_text += f"Earnings Per Share: ${eps}\n\n"
+
+with open("palo_alto_financial_summary.txt", "w") as f: f.write(input_text)
+
+else:
+print("Data not available.")
+
+except requests.RequestException as e: print(f"An error occurred: {e}")
+
+3.  Run the Python script file:
+Python PANW.py
+
+4. A separate text file, palo_alto_financial_summary.txt, and a CSV file, palo_ 
+alto_financial_data.csv, will be created once the Python script has been executed:
+• When the Python script, PANW.py, is executed, it performs several tasks to fetch and analyze the 
+earnings data of Palo Alto Networks (the symbol PANW). First, it imports two essential libraries – 
+requests to make API calls and pandas for data manipulation.
+• The script starts by defining a few key variables – the API key to access financial data, the 
+stock symbol of the company, and the URL to the Alpha Vantage API where the data can be retrieved. 
+Then, a try block is initiated to safely execute the following operations.
+• The script uses the requests.get() method to query the Alpha Vantage API. If the request is 
+successful, the response is parsed as JSON and stored in a variable named data. It then checks 
+whether data contains a key called quarterlyEarnings.
+• If this key exists, the script proceeds to convert the quarterly earnings data into a pandas 
+DataFrame. It filters this DataFrame to include only the entries between September 2021 and March 
+2023. The filtered data is then saved as a CSV file named palo_alto_financial_ data.csv:
+• The CSV file contains raw financial data in tabular form
+• The CSV file can be imported into Excel, Google Sheets, or other specialized data analysis tools
+• The script also constructs a text-based summary of the filtered earnings data, including revenue, 
+net income, and EPS for each quarter within the specified date range. This summary is saved as a 
+text file named palo_alto_financial_summary.txt:
+• The TXT file provides a human-readable summary of the financial data for Palo Alto Networks for 
+the specified data range
+• TXT files can be used for quick overviews and presentations
+
+• If any errors occur during this process, such as a failed API request, the script will catch 
+these exceptions and print an error message, thanks to the except block. This ensures that the 
+script fails gracefully, providing useful feedback instead of crashing.
+
+You can upload the CSV file (palo_alto_financial_data.csv) to ChatGPT directly if you are a ChatGPT 
+Plus user by following these steps:
+
+Uploading a CSV file directly into ChatGPT is supported through the Advanced Data Analysis option 
+for ChatGPT Plus users. You can access the OpenAI website at https://openai.com/, and then log in 
+using your login credentials. Once logged in, access your Settings and Beta options by clicking on 
+the three dots near your email address in the bottom-left corner of the screen. Go to Beta features 
+and activate the Advanced data analysis function by moving the slider to the right to activate (the 
+option will turn green). Once this feature is activated, go to GPT-4 at the top center of the 
+screen and then select Advanced Data Analysis from the drop-down list. You can click on the plus 
+sign in the dialog box to upload the CSV file to ChatGPT:
+• CSV file size limitations: 500 MB
+• CSV file retention: Files are retained while a conversation is active and for three hours after 
+the conversation is paused
+
+If you are not a ChatGPT Plus user, follow the following instructions using the OpenAI API to 
+upload the CSV file (palo_alto_financial_data.csv) into ChatGPT, and analyze the data using the GPT 
+3.5 turbo model:
+
+1.  Create a new Python script file in Notepad, Notepad++, PyCharm, or Visual Studio Code. It is 
+important that you add your OpenAI API key to the following api_key line. Copy and paste the 
+following code into your Python script file and name it OPENAIAPI.py:
+
+import openai import pandas as pd
+df = pd.read_csv("palo_alto_financial_data.csv") csv_string = df.to_string(index=False)
+
+api_key = "your_openai_api_key_here" openai.api_key = api_key
+
+input_text = f"Here is the financial data for Palo Alto Networks:\n\n{csv_string}\n\nPlease analyze 
+the data and provide insights."
+
+response = openai.Completion.create(
+engine="gpt-3.5-turbo", # Specifying GPT-3.5-turbo engine prompt=input_text,
+
+ChatGPT for financial analysis – analyzing earnings reports for Palo Alto Networks  19
+
+
+
+max_tokens=200 # Limiting the length of the generated text
+)
+
+
+
+
+
+generated_text = response.choices[0].text.strip() print("GPT-3.5-turbo PANW Analysis:", 
+generated_text)
+
+2.  Run the Python script file:
+Python OPENAIAPI.py
+
+This Python code snippet is responsible for interacting with the OpenAI API to send the formatted 
+text input (the financial data prompt) to ChatGPT and receive the generated response. Here’s a 
+breakdown of each part:
+•  The Python code snippet starts by importing two essential Python libraries – openai for 
+interacting with the OpenAI API, and pandas for data manipulation.
+•  The script reads financial data from a CSV file named palo_alto_financial_data. csv using 
+pandas, converting this data into a formatted string. It then sets up the OpenAI API by 
+initializing it with a user-provided API key.
+•  Following this, the script prepares a prompt for GPT-3.5-turbo, consisting of the loaded 
+financial data and a request for analysis. This prompt is sent to the GPT-3.5-turbo engine via the 
+OpenAI API, which returns a text-based analysis, limited to 200 tokens.
+•  The generated analysis is then extracted from the API’s response and printed to the console with 
+the label “GPT-3.5-turbo PANW Analysis.” The script essentially automates the process of sending 
+financial data to the GPT-3.5-turbo engine for insightful analysis, making it easy to get
+insights on Palo Alto Networks’ financial performance.
+
+Instructions to access and store Palo Alto Networks’ 10-Q reports
+using sec-api (September 2021–March 2023)
+
+In this section, we’ll present an alternative, more detailed method to load Palo Alto Networks’ 
+10-Q filings into ChatGPT, should you prefer not to use the high-level instructions provided on 
+page 20. This approach is designed to help you extract 10-Q information for the period between 
+September 2021 and March 2023. We’ve included this method as we’ll refer to it in later chapters 
+when updating ChatGPT with more recent financial information, which is necessary for our examples 
+and case studies. This alternative ensures you have a choice in how you prefer to access and load 
+the SEC data.
+
+
+The SEC reports for instructions on how to access and store the 10-Q reports using sec-api and 
+Python for Palo Alto Networks (non-technical user step-by-step instructions) are required, since 
+the ChatGPT model only includes information up to September 2021. Follow these steps:
+1. Open a command prompt or terminal window on your computer.
+2. Install the sec-api package by running the following command:
+pip install sec-api==1.0.16
+3.  Open a code editor or IDE of your choice, and create a new file named sec_api_example.py.
+4.  Copy and paste the following code into the new Python file that we just created:
+import requests import json import re
+from xbrl import XBRLParser url = "https://api.sec-api.io" query = {
+"query": {
+"query_string": {
+"query": "ticker:PANW AND formType:10-Q AND filedAt:{2021-09-01 TO 2023-03-31}"
+}
+
+
+},
+"from": "0",
+"size": "10",
+"sort": [{"filedAt": {"order": "desc"}}]
+}
+
+
+api_key = "YOUR_API_KEY"
+response = requests.post(url, json=query, headers={"Authorization": api_key})
+filings = json.loads(response.content)
+with open("panw_10q_filings.json", "w") as outfile: json.dump(filings, outfile)
+
+print("10-Q filings for Palo Alto Networks have been saved to panw_10q_filings.json")
+
+revenue_xbrl = [] net_income_xbrl = [] eps_xbrl = []
+
+for xbrl_file in xbrl_files: xbrl_parser = XBRLParser()
+
+
+xbrl = xbrl_parser.parse(open(xbrl_file)) revenue_xbrl.append(xbrl_parser.extract_value(xbrl,
+'us-gaap:Revenues'))
+net_income_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:NetIncomeLoss'))
+eps_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:EarningsPerShare'))
+
+revenue_text = [] net_income_text = [] eps_text = []
+
+for text_file in text_files:
+with open(text_file, 'r') as f: content = f.read()
+revenue_text.append(re.search('Revenue\s+(\d+)', content). group(1))
+net_income_text.append(re.search('Net Income\s+(\d+)', content).group(1))
+eps_text.append(re.search('Earnings Per Share\s+(\d+.\d+)', content).group(1))
+
+data = {
+'revenue_xbrl': revenue_xbrl, 'net_income_xbrl': net_income_xbrl, 'eps_xbrl': eps_xbrl, 
+'revenue_text': revenue_text, 'net_income_text': net_income_text, 'eps_text': eps_text
+
+
+
+
+}
+
+with open('financial_metrics.json', 'w') as f: json.dump(data, f)
+
+print("Extracted financial metrics have been saved to financial_ metrics.json")
+
+5.  Run the Python script file:
+python sec_api_example.py
+The Python code provided here is used to fetch Palo Alto Networks’ 10-Q filings between 1 
+September, 2021 and 31 March 31, 2023, from the SEC API, with the results saved as a JSON file. 
+Here’s a step-by-step explanation of the code:
+
+Fetch 10-Q filings:
+
+1.  Import the requests library to make HTTP requests and the json library to handle JSON data.
+2. Define the API endpoint URL and the query parameters. The query dictionary specifies the search 
+criteria.
+3.  Define your SEC API key by replacing "YOUR_API_KEY" with your actual API key.
+4.  Make a POST request to the SEC API using requests.post(), with the specified URL, query 
+parameters, and API key as headers.
+5.  Parse the response content using json.loads(), and store it in the filings variable.
+6.  Save the filings data to a JSON file named "panw_10q_filings.json" using json. dump().
+7. Print a confirmation message.
+Extract the metrics from XBRL files:
+1. Import the XBRLParser class from the xbrl library.
+2.  Initialize empty lists to store revenue, net income, and EPS metrics.
+3.  Loop through each XBRL file (assumed to be in a list named xbrl_files).
+4. Use the XBRLParser to parse the XBRL file and extract the required financial metrics.
+5. Append the extracted metrics to the lists initialized earlier.
+Extract the metrics from the text files:
+1. Import the re (regular expressions) library.
+2.  Initialize empty lists to store revenue, net income, and EPS metrics.
+3.  Loop through each text file (assumed to be in a list named text_files).
+4.  Use regular expressions to extract the required financial metrics from the text content.
+5. Append the extracted metrics to the lists initialized earlier.
+Save the extracted metrics to a JSON file:
+1.  Create a dictionary to store all the extracted metrics.
+2.  Save this dictionary as a JSON file named 'financial_metrics.json', using json. dump().
+3. Print a confirmation message.Chapter-1
