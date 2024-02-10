@@ -1,0 +1,485 @@
+Aggressive trading (using options) – buying call options on Beazley and Hiscox and selling put 
+options on CrowdStrike
+In this aggressive trade strategy, we are buying call options on Beazley and Hiscox, indicating 
+that we are bullish on these insurers. Simultaneously, we are selling put options on CrowdStrike, 
+expressing a more cautious view. This strategy aims to leverage the expected growth in cyber 
+insurance, coupled with a possible overvaluation of CrowdStrike:
+1.  Install the yfinance package with pip install yfinance
+2. Run the following Python code:
+# Import necessary libraries import yfinance as yf
+def buy_call_options(symbol, strike, expiration, contracts): print(f"Buying {contracts} call 
+options for {symbol} with
+strike {strike} and expiration {expiration}.") # TODO: Add your actual trading logic here
+def sell_put_options(symbol, strike, expiration, contracts): print(f"Selling {contracts} put 
+options for {symbol} with
+strike {strike} and expiration {expiration}.")
+# TODO: Add your actual trading logic here
+
+
+# Define the strike price, expiration date, and number of contracts
+# NOTE: Replace the following values with those relevant to your strategy
+beazley_strike = 150
+beazley_expiration = '2023-12-15'
+beazley_contracts = 10
+
+hiscox_strike = 120
+hiscox_expiration = '2023-12-15'
+hiscox_contracts = 10
+
+crowdstrike_strike = 200
+crowdstrike_expiration = '2023-12-15'
+crowdstrike_contracts = 10
+
+# Place trades
+buy_call_options('BEZ.L', beazley_strike, beazley_expiration, beazley_contracts)
+buy_call_options('HSX.L', hiscox_strike, hiscox_expiration, hiscox_contracts)
+sell_put_options('CRWD', crowdstrike_strike, crowdstrike_ expiration, crowdstrike_contracts)
+
+Example functions with highlighted replacement areas
+The following are example functions that simulate what the buy_call_options and sell_put_options 
+functions might look like with actual trading logic:
+# Example of what buy_call_options might look like
+def buy_call_options(symbol, strike, expiration, contracts): your_trading_platform_api.buy_options(
+symbol = symbol,      # <-- Replace with your variable or hard-coded value
+strike_price = strike,    # <-- Replace with your variable or hard-coded value
+expiration_date = expiration, # <-- Replace with your variable or hard-coded value
+contract_type = 'CALL',
+num_of_contracts = contracts # <-- Replace with your variable or hard-coded value
+)
+
+# Example of what sell_put_options might look like
+def sell_put_options(symbol, strike, expiration, contracts):
+
+
+your_trading_platform_api.sell_options(
+symbol = symbol,      # <-- Replace with your variable or hard-coded value
+strike_price = strike,    # <-- Replace with your variable or hard-coded value
+expiration_date = expiration, # <-- Replace with your variable or hard-coded value
+contract_type = 'PUT',
+num_of_contracts = contracts # <-- Replace with your variable or hard-coded value
+)
+
+In these example functions, replace the placeholders (your_trading_platform_api, symbol, strike, 
+expiration, contracts) with the actual details relevant to your trading strategy and platform.
+Prepare to turn the dial down but keep the wisdom up. Welcome to the realm of conservative trading 
+strategies, where slow and steady could very well win the race! In this nuanced strategy, we’re 
+taking a bullish stance on insurance giants Beazley and Hiscox by directly buying their stocks. But 
+that’s not all. We’re keeping a keen eye on CrowdStrike, waiting for a 5% dip to swoop in and snag 
+its shares.
+Why this balanced approach, you ask? Because in the world of investing, timing and caution can be 
+just as electrifying as any high-stakes gamble. If you’re someone who appreciates the art of 
+calculated risk and the allure of steady gains, then this section is your masterclass. Ready to 
+navigate the financial markets with poise and precision? Let’s get started!
+
+Conservative trading (using stock) – buying stock in Beazley and Hiscox and buying stock in 
+CrowdStrike once it falls 5% from its current price
+In this conservative trade strategy, we are directly buying stocks in Beazley and Hiscox, signaling 
+a bullish view of these insurers. Meanwhile, we set a limit order to buy CrowdStrike’s stock once 
+it falls 5% from the current levels, indicating a more cautious approach:
+a). Assumes yfinance library has already been installed on the PC. If not, please complete this 
+step first.
+pip install yfinance
+b). Run python code
+# Import necessary libraries import yfinance as yf
+
+def buy_stock(symbol, num_shares):
+print(f"Buying {num_shares} shares of {symbol}.") # TODO: Add your actual trading logic here
+
+
+def place_limit_order(symbol, target_price, num_shares): print(f"Placing limit order for 
+{num_shares} shares of {symbol} at
+target price {target_price}.")
+# TODO: Add your actual trading logic here
+
+# Define the stock symbols and number of shares to buy
+# NOTE: Replace the following values with those relevant to your strategy
+beazley_stock = 'BEZ.L' hiscox_stock = 'HSX.L' crowdstrike_stock = 'CRWD' num_shares_beazley = 100
+num_shares_hiscox = 100
+num_shares_crowdstrike = 100
+
+# Place trades
+buy_stock(beazley_stock, num_shares_beazley) buy_stock(hiscox_stock, num_shares_hiscox)
+
+# Check current price of CrowdStrike
+crowdstrike_price = yf.Ticker(crowdstrike_stock).history().tail(1) ['Close'].iloc[0]
+
+# Determine target price (5% below current price) target_price = crowdstrike_price * 0.95
+
+# Place limit order
+place_limit_order(crowdstrike_stock, target_price, num_shares_ crowdstrike)
+
+Example functions with highlighted replacement areas
+The following are example functions that simulate what the buy_stock and place_limit_order 
+functions might look like with actual trading logic:
+# Example of what buy_stock might look like def buy_stock(symbol, num_shares):
+your_trading_platform_api.buy_stock(
+symbol = symbol,       # <-- Replace with your variable or hard-coded value
+num_of_shares = num_shares  # <-- Replace with your variable or hard-coded value
+)
+
+
+# Example of what place_limit_order might look like
+def place_limit_order(symbol, target_price, num_shares): 
+your_trading_platform_api.place_limit_order(
+symbol = symbol,       # <-- Replace with your variable or hard-coded value
+target_price = target_price,  # <-- Replace with your variable or hard-coded value
+num_of_shares = num_shares  # <-- Replace with your variable or hard-coded value
+)
+
+In these example functions, replace the placeholders (your_trading_platform_api, symbol, 
+target_price, num_shares) with the actual details relevant to your trading strategy and platform.
+Both investment strategies require continuous monitoring and adjustments based on market 
+conditions. It’s also essential to consult with a financial advisor to align these strategies with 
+individual investment
+goals, risk tolerance, and financial situation.
+
+Get ready for a riveting journey—a code-driven odyssey into the world of aggressive trading powered 
+by Python. This section isn’t merely a tutorial; it’s an action-packed course that turns Python 
+code into the engine room of your trading cockpit. We start by assembling our trade options in a 
+data frame called options_df, saving it as a CSV file for easy access. Our get_option_price 
+function acts as a conduit to real-time option pricing, pulling in vital data based on the ticker, 
+strike price, and expiration date. This is then neatly organized in another data frame, 
+positions_df, also saved as a CSV file. As we move forward, expect to delve into time series 
+plotting and risk analysis, where you’ll learn to visualize price trends and calculate potential 
+gains or losses.
+The following is the Python code to create a CSV file:
+a). Install yfinance and pandas first (if this has not already been done)
+pip install pandas pip install yfinance
+b). Run the following Python code: import pandas as pd
+import yfinance as yf
+# Define your variables here
+# NOTE: Replace the '...' with actual values
+beazley_stock = 'BEZ.L'
+
+
+hiscox_stock = 'HSX.L' crowdstrike_stock = 'CRWD' beazley_strike = ... hiscox_strike = ... 
+crowdstrike_strike = ... beazley_expiration = ... hiscox_expiration = ... crowdstrike_expiration = 
+... beazley_contracts = ... hiscox_contracts = ... crowdstrike_contracts = ...
+
+# Create DataFrame for option positions options_df = pd.DataFrame({
+'Symbol': [beazley_stock, hiscox_stock, crowdstrike_stock], 'Type': ['Call', 'Call', 'Put'],
+'Strike': [beazley_strike, hiscox_strike, crowdstrike_strike],
+'Expiration': [beazley_expiration, hiscox_expiration, crowdstrike_ expiration],
+'Contracts': [beazley_contracts, hiscox_contracts, crowdstrike_ contracts]
+})
+
+# Save DataFrame to CSV options_df.to_csv('aggressive_trade_options.csv', index=False)
+
+# Function to fetch real-time price
+def get_option_price(ticker, strike, expiration, option_type='call'): # TODO: Add your actual 
+trading logic here
+return ...
+
+# Open Positions Table positions = []
+for symbol, strike, expiration, contracts in [(beazley_stock, beazley_ strike, beazley_expiration, 
+beazley_contracts),
+(hiscox_stock, hiscox_
+
+
+strike, hiscox_expiration, hiscox_contracts),
+(crowdstrike_stock,
+
+
+
+crowdstrike_strike, crowdstrike_expiration, crowdstrike_contracts)]: price = 
+get_option_price(symbol, strike, expiration) positions.append([symbol, strike, expiration, 
+contracts, price *
+contracts])
+
+positions_df = pd.DataFrame(positions, columns=['Symbol', 'Strike', 'Expiration', 'Contracts', 
+'Value'])
+
+positions_df.to_csv('aggressive_positions.csv',    index=False)    
+# Time Series Plot
+# TODO: Add your actual trading logic here
+
+# Risk Analysis Chart
+# TODO: Add your actual trading logic here
+Notes
+Replace all the … with the actual values you want to use.
+You’ll need to implement the get_option_price() function to get real-time option prices. This will 
+depend on the data source or brokerage you are using.
+The time series plot and risk analysis chart sec        TODO as you’ll need to add
+the actual logic based on your requirements.
+
+The Zen of conservative trade: unleashing Python for steady gains
+This section is a haven for those seeking a calculated, steady approach to trading. We’ll be 
+working with Python code to execute conservative trading strategies for stocks such as Beazley, 
+Hiscox, and CrowdStrike.
+First, we define crucial variables such as stock symbols, number of shares, and target prices. 
+Then, using Python’s pandas library, we craft a data frame to neatly catalog these variables. We 
+also save this data to a CSV file for future use. After that, the script jumps into real-time mode, 
+fetching the most recent stock prices to populate your open positions table—another data frame 
+we’ll save to a CSV. Finally, the script ends by updating a limit order status data frame, which 
+monitors how close the current stock price is to your target buy price.
+The following is the Python code to create a CSV file:
+1.  Install yfinance and pandas first (if this has not already been done):
+pip install pandas
+pip install yfinance
+
+
+
+2. Run the following Python code:
+import pandas as pd import yfinance as yf
+
+# Define your variables here
+# NOTE: Replace the '...' with actual values beazley_stock = ...
+hiscox_stock = ... crowdstrike_stock = ... num_shares_beazley = ... num_shares_hiscox = ... 
+num_shares_crowdstrike = ...
+target_price = ... # Target price for CrowdStrike
+
+# Create DataFrame for stock positions stock_df = pd.DataFrame({
+'Symbol': [beazley_stock, hiscox_stock, crowdstrike_stock],
+'Shares': [num_shares_beazley, num_shares_hiscox, num_ shares_crowdstrike],
+'Target_Price': [None, None, target_price]
+
+
+})
+
+# Save DataFrame to CSV stock_df.to_csv('conservative_trade_stocks.csv', index=False)
+
+# Function to fetch real-time stock price def get_stock_price(ticker):
+return yf.Ticker(ticker).history().tail(1)['Close'].iloc[0]
+
+# Open Positions Table positions = []
+for symbol, shares in [(beazley_stock, num_shares_beazley),
+(hiscox_stock, num_shares_hiscox)]: price = get_stock_price(symbol)
+positions.append([symbol, shares, price, price * shares]) #
+Adjust to include average cost
+
+positions_df = pd.DataFrame(positions, columns=['Symbol', 'Shares', 'Current Price', 'Value'])
+positions_df.to_csv('conservative_positions.csv', index=False)
+
+# Time Series Plot
+# TODO: Add your actual trading logic here
+
+Visual alchemy: transmuting raw data into golden insights with Power BI  21
+
+
+# Limit Order Status
+limit_order_status = pd.DataFrame([[crowdstrike_stock, target_ price, 
+get_stock_price(crowdstrike_stock)]],
+columns=['Symbol', 'Target
+
+
+Price', 'Current Price']) limit_order_status.to_csv('limit_order_status.csv', index=False)
+Notes
+Replace all the ... with the actual values you want to use.
+The time series plot section          ’ll need to add the actual logic based on
+your specific requirements.
+
+HackerGPT (FinGPT-integrated)
+The HackerGPT series are LLMs fine-tuned using the LoRA method on cybersecurity and regulatory 
+datasets. With FinGPT’s data-centric approach serving as its backbone, this version excels at tasks 
+such as cybersecurity sentiment analysis. If you’re keen to delve deeper, a detailed tutorial on 
+reproducing our experiment’s results through benchmarks is underway.
+By using FinGPT as part of the model architecture, HackerGPT not only gains the ability to analyze 
+cybersecurity but also leverages real-time financial data, making it a comprehensive tool for 
+various stakeholders in the cybersecurity and financial ecosystems.
+FinGPT Source: GitHub: MIT License AI4 Foundation and Bruce Yang https://github. 
+com/AI4Finance-Foundation/FinGPT
+FinGPT using HackerGPT AI persona:
+1. Installations
+pip install transformers==4.30.2 peft==0.4.0 pip install sentencepiece
+pip install accelerate
+pip install torch
+
+
+
+pip install peft
+2. Run the following Python code:
+# Import necessary libraries
+from transformers import AutoModel, AutoTokenizer
+from peft import PeftModel # If you are not using PeftModel, you can comment out this line.
+
+# Initialize model and tokenizer paths
+# Replace with the actual model paths or API keys base_model = "THUDM/chatglm2-6b"
+hacker_model = "yourusername/HackerGPT_ChatGLM2_Cyber_ Instruction_LoRA_FT"
+
+# Load tokenizer and models
+tokenizer = AutoTokenizer.from_pretrained(base_model) model = AutoModel.from_pretrained(base_model)
+
+# NOTE ABOUT PeftModel:
+# PeftModel is a custom model class that you may be using for fine-tuning or specific 
+functionalities.
+# Ensure it's properly installed in your environment.
+# Uncomment the following line if you are using PeftModel. # model = 
+PeftModel.from_pretrained(model, hacker_model)
+
+# Switch to evaluation mode (if needed, consult your model's documentation)
+model = model.eval()
+
+# Define prompts prompt = [
+'''Instruction: What is the potential impact of this regulatory change on the cybersecurity 
+industry? Please provide an analysis.
+Input: New GDPR regulations have been introduced, strengthening data protection requirements for 
+businesses across Europe.
+Answer: ''',
+'''Instruction: Assess the potential investment opportunities in the cyber insurance sector 
+following this breach.
+Input: A major cybersecurity breach has affected several financial institutions, exposing sensitive 
+customer data.
+Answer: ''',
+'''Instruction: How does this cybersecurity advancement affect the technology industry?
+Input: A leading tech company has developed advanced AI-powered cybersecurity solutions that can 
+detect and prevent threats in
+
+real time. Answer: ''',
+]
+# Generate responses
+tokens = tokenizer(prompt, return_tensors='pt', padding=True, max_length=512)
+res = model.generate(**tokens, max_length=512) res_sentences = [tokenizer.decode(i) for i in res] 
+out_text = [o.split("Answer: ")[1] for o in res_sentences]
+# Display generated analyses for analysis in out_text:
+print(analysis)
+IMPORTANT NOTES
+# 1. Run this code on a machine with at least a T4 GPU and high RAM for optimal performance.
+# 2. Remember to replace the placeholder model names with the actual model names you want to use.
+
+This code snippet and model configuration are tailored to assess various aspects of cybersecurity, 
+such as regulatory impacts, potential investment opportunities, and technological advancements. By 
+analyzing the given inputs, the model can provide insightful and detailed responses relevant to the
+cybersecurity landscape.
+
+Source: GitHub: MIT License: https://github.com/geekan/MetaGPT.
+
+Source: MetaGPT: Meta Programming for Multi-Agent Collaborative Framework Paper:
+[2308.00352] MetaGPT: Meta Programming for Multi-Agent Collaborative Framework (arxiv.org) 
+(https://arxiv.org/abs/2308.00352)
+By Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, 
+Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, Lingfeng Xiao, Chenglin Wu
+The following is a Python code snippet:
+1.  Begin with the installations:
+npm --version
+sudo npm install -g @mermaid-js/mermaid-cli git clone https://github.com/geekan/metagpt cd metagpt
+python setup.py install
+2. Run the following Python code:
+# Configuration: OpenAI API Key
+# Open the config/key.yaml file and insert your OpenAI API key in place of the placeholder.
+# cp config/config.yaml config/key.yaml
+# save and close file
+
+
+
+# Import Necessary Libraries import asyncio
+import json
+from typing import Callable
+from pydantic import parse_obj_as
+
+# Import MetaGPT Specific Modules from metagpt.actions import Action from metagpt.config import 
+CONFIG from metagpt.logs import logger
+from metagpt.tools.search_engine import SearchEngine
+from metagpt.tools.web_browser_engine import WebBrowserEngine,
+WebBrowserEngineType
+from metagpt.utils.text import generate_prompt_chunk, reduce_ message_length
+
+# Define Roles
+# NOTE: Replace these role definitions as per your project's needs.
+RESEARCHER_ROLES = {
+'cybersecurity_regulatory_researcher': "Cybersecurity Regulatory Researcher",
+'cyber_breach_researcher': "Cyber Breach Researcher", 'investment_analyst': "Investment Analyst", 
+'investment_trader': "Investment Trader", 'portfolio_manager': "Portfolio Manager"
+
+
+}
+
+# Define Prompts
+# NOTE: Customize these prompts to suit your project's specific requirements.
+LANG_PROMPT = "Please respond in {language}."
+
+RESEARCH_BASE_SYSTEM = """You are a {role}. Your primary goal is to understand and analyze \
+changes in cybersecurity regulations or breaches, identify investment opportunities, and make 
+informed \
+decisions on financial products, aligning with the current cybersecurity landscape."""
+
+RESEARCH_TOPIC_SYSTEM = "You are a {role}, and your research topic is \"{topic}\"."
+
+SEARCH_TOPIC_PROMPT = """Please provide up to 2 necessary keywords related to your \
+
+
+research topic on cybersecurity regulations or breaches that require Google search. \
+Your response must be in JSON format, for example: ["cybersecurity regulations", "cyber breach 
+analysis"]."""
+
+SUMMARIZE_SEARCH_PROMPT = """### Requirements
+1. The keywords related to your research topic and the search results are shown in the "Reference 
+Information" section.
+2. Provide up to {decomposition_nums} queries related to your research topic based on the search 
+results.
+3. Please respond in JSON format as follows: ["query1", "query2", "query3", ...].
+### Reference Information
+{search} """
+
+DECOMPOSITION_PROMPT = """You are a {role}, and before delving into a research topic, you break it 
+down into several \
+sub-questions. These sub-questions can be researched through online searches to gather objective 
+opinions about the given \
+topic.
+---
+The topic is: {topic}
+---
+Now, please break down the provided research topic into
+{decomposition_nums} search questions. You should respond with an array of \
+strings in JSON format like ["question1", "question2", ...]. """
+COLLECT_AND_RANKURLS_PROMPT = """### Reference Information
+1. Research Topic: "{topic}"
+2. Query: "{query}"
+3. The online search results: {results}
+---
+Please remove irrelevant search results that are not related to the query or research topic. Then, 
+sort the remaining search results \
+based on link credibility. If two results have equal credibility, prioritize them based on 
+relevance. Provide the ranked \
+results' indices in JSON format, like [0, 1, 3, 4, ...], without including other words.
+"""
+WEB_BROWSE_AND_SUMMARIZE_PROMPT = '''### Requirements
+1. Utilize the text in the "Reference Information" section to respond to the question "{query}".
+2. If the question cannot be directly answered using the text,
+
+
+but the text is related to the research topic, please provide \ a comprehensive summary of the 
+text.
+3. If the text is entirely unrelated to the research topic, please reply with a simple text "Not 
+relevant."
+4. Include all relevant factual information, numbers, statistics, etc., if available.
+### Reference Information
+{content} '''
+
+CONDUCT_RESEARCH_PROMPT = '''### Reference Information
+{content}
+### Requirements
+Please provide a detailed research report on the topic: "{topic}", focusing on investment 
+opportunities arising \
+from changes in cybersecurity regulations or breaches. The report must:
+- Identify and analyze investment opportunities in the US market.
+- Detail how and when to invest, the structure for the investment, and the implementation and exit 
+strategies.
+- Adhere to APA style guidelines and include a minimum word count of 2,000.
+- Include all source URLs in APA format at the end of the report.
+'''
+# Roles RESEARCHER_ROLES = {
+'cybersecurity_regulatory_researcher': "Cybersecurity Regulatory Researcher",
+'cyber_breach_researcher': "Cyber Breach Researcher", 'investment_analyst': "Investment Analyst", 
+'investment_trader': "Investment Trader", 'portfolio_manager': "Portfolio Manager"
+
+
+}
+
+# The rest of the classes and functions remain unchanged
+
+
+Important notes:
+•  Execute the installation and setup commands in your terminal before running the Python script
+• Don’t forget to replace placeholder texts in config files and the Python script with actual data 
+or API keys
+•  Ensure that MetaGPT is properly installed and configured on your machine
+
+In this high-stakes exploration, we dissect the exhilarating yet precarious world of LLM-integrated 
+applications. We delve into how they’re transforming finance while posing emergent ethical dilemmas 
+and security risks that simply cannot be ignored. Be prepared to journey through real-world case 
+studies that highlight the good, the bad, and the downright ugly of LLM applications in finance, 
+from
+market-beating hedge funds to costly security breaches and ethical pitfalls.
+
+
+
