@@ -1,0 +1,564 @@
+Now, we’ll take you on a hands-on journey in implementing the Moderna Momentum investment strategy, 
+breaking down its multiple facets into easy-to-follow steps with help from ChatGPT as our guide. 
+You’ll start by setting up your Python environment, fetching clinical trial data through APIs, and 
+segueing into crafting trading signals based on FDA announcements and earnings reports. To enhance 
+the strategy, we incorporate sentiment analysis using cutting-edge AI tools and refine the trade 
+calls with real-time R&D spending data:
+
+1.  First, let’s install the required packages:
+pip install requests pandas schedule
+2. Run the following Python code:
+import requests
+import xml.etree.ElementTree as ET import pandas as pd
+import schedule import time
+# Function to fetch clinical trials data def fetch_clinical_trials_data():
+# Create URL
+url = "https://clinicaltrials.gov/api/query/study_fields? 
+expr=Moderna&fields=NCTId,BriefTitle,Condition,StatusVerified Date&min_rnk=1&max_rnk=&fmt=xml"
+# Send GET request
+response = requests.get(url)
+# If the request was unsuccessful, return if response.status_code != 200:
+print("Failed to get data") return
+
+# Parse XML response
+root = ET.fromstring(response.content)
+
+
+
+# Create DataFrame to store study data
+df = pd.DataFrame(columns=['NCTId', 'BriefTitle', 'Condition', 'StatusVerifiedDate'])
+
+# Iterate over studies and add selected fields to DataFrame for study in root.findall(".//Study"): 
+# Updated to find
+Study tags under any parent tag
+nct_id = study.find('NCTId').text if study.find('NCTId') is not None else None
+brief_title = study.find('BriefTitle').text if study. find('BriefTitle') is not None else None
+condition = study.find('Condition').text if study. find('Condition') is not None else None
+status_verified_date = study.find('StatusVerifiedDate'). text if study.find('StatusVerifiedDate') 
+is not None else None
+
+df = df.append({'NCTId': nct_id, 'BriefTitle': brief_ title, 'Condition': condition, 
+'StatusVerifiedDate': status_ verified_date}, ignore_index=True)
+
+# Write DataFrame to CSV file if not df.empty:
+df.to_csv('clinical_trials_data.csv', index=False) else:
+print("No data to write")
+
+# Schedule the function to run once per day 
+schedule.every().day.at("00:00").do(fetch_clinical_trials_data)
+
+# Keep the script running while True:
+schedule.run_pending() time.sleep(1)
+ClinicalTrials.gov provides a convenient API to access the information in XML format. This is a 
+Python code snippet for fetching all studies by Moderna using the ClinicalTrials.gov API. It will 
+use the requests library to make the HTTP request and the xml.etree.ElementTree library to parse 
+the XML response.
+3.  Create a standalone buy or sell signal based on clinical trial news on the clinicaltrials.gov 
+website:
+• Buy signal: Positive phase II/III results or successful completion of a trial, leading to 
+potential regulatory review
+• Sell signal: Failure in phase II/III trials
+
+
+You will need to make sure that your CSV file includes data about the phase of the trial (for 
+example, in a Phase column) and the outcome of the trial (for example, in an Outcome column):
+from alpaca_trade_api import REST import pandas as pd
+
+# initialize Alpaca API
+api = REST('<ALPACA_API_KEY>', '<ALPACA_SECRET_KEY>', base_
+url='https://paper-api.alpaca.markets')
+
+# load clinical trials data
+df = pd.read_csv('clinical_trials_data.csv')
+
+# iterate over each row in DataFrame for index, row in df.iterrows():
+brief_title = row['BriefTitle'] phase = row['Phase']
+outcome = row['Outcome']
+status_verified_date = row['StatusVerifiedDate']
+
+# if Phase II/III clinical trial result is positive or trial completed successfully, send buy order
+if ('Phase II' in phase or 'Phase III' in phase) and ('positive' in outcome.lower() or 'completed' 
+in outcome. lower()):
+api.submit_order( symbol='MRNA', qty='100', side='buy', type='limit', time_in_force='gtc',
+limit_price=api.get_last_trade('MRNA').price
+
+
+
+)
+print(f'Buy signal on {status_verified_date} at {api. get_last_trade("MRNA").price}')
+
+# if Phase II/III clinical trial result is negative, send sell order
+elif ('Phase II' in phase or 'Phase III' in phase) and 'failed' in outcome.lower():
+api.submit_order( symbol='MRNA', qty='100', side='sell', type='limit',
+
+
+26  Moderna and OpenAI – Biotech and AGI Breakthroughs
+
+
+
+time_in_force='gtc', limit_price=api.get_last_trade('MRNA').price
+)
+
+print(f'Sell signal on {status_verified_date} at {api. get_last_trade("MRNA").price}')
+This code snippet checks for phase II or phase III trials and if the outcome is positive or the 
+trial has been completed, it generates a buy signal. Conversely, if the phase II or phase III trial 
+has failed, it generates a sell signal.
+Please note that you need to replace the <ALPACA_API_KEY> and <ALPACA_SECRET_KEY>
+placeholder variables with your actual API key and secret key from Alpaca.
+Important note
+This is a simplified example and may not be sufficient for actual trading. In practice, you would 
+want to include additional checks and balances, such as checking whether you already hold shares 
+before selling, and additional logic to determine the appropriate quantity and price for each 
+order.
+
+4.  FDA regulatory announcements (standalone trade signal):
+• Buy: Approval of a new drug/vaccine or a new indication for an existing drug
+• Sell: Regulatory rejection of a new drug/vaccine or a critical safety concern raised
+• Source: FDA announcements
+Here’s how you can use Python’s BeautifulSoup library to scrape the FDA’s press announcements web 
+page for any articles that mention “Moderna.” Once we’ve done this, we can store the relevant data 
+in a CSV file:
+pip install schedule import requests
+from bs4 import BeautifulSoup import csv
+import re import schedule import time
+
+def job():
+url = "https://www.fda.gov/news-events/fda-newsroom/press- announcements"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser') # Find all article links on the page
+
+article_links = soup.find_all('a', class_='col-md-12')
+
+# Open a CSV file to store the data
+with open('fda_announcements.csv', 'w', newline='') as file: writer = csv.writer(file)
+# Write the header writer.writerow(["Title", "Link", "Date"])
+
+# Loop through each article link for link in article_links:
+# Find the title and date
+title = link.find('h2').text.strip()
+date = link.find('span', class_='field-content').
+text.strip()
+
+# Check if the title mentions "Moderna"
+if re.search('moderna', title, re.IGNORECASE): # Write the data to the CSV file
+writer.writerow([title, 'https://www.fda.gov' + link['href'], date])
+
+print("Data has been written to fda_announcements.csv")
+
+# schedule the job every day at a certain time, e.g., 9:00 am 
+schedule.every().day.at("09:00").do(job)
+
+# Keep the script running. while True:
+schedule.run_pending() time.sleep(1)
+The script will run every day at 9:00 A.M. Please adjust the timing according to your needs. Note 
+that this script should be running all the time to be able to execute the job. This script will 
+search through all of the articles listed on the FDA’s press announcements page and find any that 
+have “Moderna” in the title. It will then write the title, URL, and date of each article to a CSV 
+file.
+Please note that this script only scrapes the first page of announcements. If you want to scrape 
+more pages, you’ll have to modify the script to navigate to the next page and repeat the scraping 
+process.
+
+
+Important note on pagination
+The current script fetches data only from the first page of results. If the data is spread across 
+multiple pages, you’ll need to extend the script to handle pagination. Here are some general 
+strategies to do so:
+
+5.  API-based pagination: If you’re working with an API that supports pagination, look for 
+parameters such as page, offset, or limit in the API documentation. You can increment these 
+parameters in a loop until you’ve fetched all pages:
+page = 1 while True:
+url = f"https://api.example.com/data?page={page}" # fetch data
+# …
+if no_more_data: break
+page += 1
+
+6.  Web scraping with the Next button: If you’re scraping a website, identify the Next button’s 
+HTML element and simulate a click, or navigate to the next URL, to scrape subsequent pages:
+while True:
+# scrape data from the current page # ...
+next_button = soup.find('a', {'class': 'next-button'}) if next_button is None:
+break else:
+next_url = next_button['href']
+# update your soup object with the next_url
+
+7.  Rate limiting: Always be aware of the rate-limiting policies when dealing with APIs or web 
+scraping. Insert appropriate time delays in your loops to avoid getting blocked.
+8.  Data storage: When dealing with multiple pages, consider storing the data incrementally – 
+either appending it to a file or a database – to avoid losing all fetched data in case of an error 
+or interruption.
+9.  Create a standalone buy or sell signal based on FDA announcements on the FDA website:
+• Buy: Approval of a new drug/vaccine or a new indication for an existing drug
+• Sell: Regulatory rejection of a new drug/vaccine or a critical safety concern raised:
+from alpaca_trade_api import REST import pandas as pd
+
+
+
+# initialize Alpaca API
+api = REST('<ALPACA_API_KEY>', '<ALPACA_SECRET_KEY>', base_
+url='https://paper-api.alpaca.markets')
+
+# load FDA announcements data
+df = pd.read_csv('fda_announcements.csv')
+
+# iterate over each row in DataFrame for index, row in df.iterrows():
+title = row['Title'] date = row['Date']
+
+# if FDA announcement indicates approval of a new drug/ vaccine or a new indication for an existing 
+drug, send buy order
+if ('approval' in title.lower() and 'moderna' in title. lower()) or ('new indication' in 
+title.lower() and 'moderna' in title.lower()):
+api.submit_order( symbol='MRNA', qty='100', side='buy', type='limit', time_in_force='gtc',
+limit_price=api.get_last_trade('MRNA').price
+
+
+)
+print(f'Buy signal on {date} at {api.get_last_ trade("MRNA").price}')
+
+# if FDA announcement indicates regulatory rejection of a new drug/vaccine or a critical safety 
+concern is raised, send sell order
+elif ('rejection' in title.lower() and 'moderna' in title. lower()) or ('critical safety concern' 
+in title.lower() and 'moderna' in title.lower()):
+api.submit_order( symbol='MRNA', qty='100', side='sell', type='limit', time_in_force='gtc',
+limit_price=api.get_last_trade('MRNA').price
+
+
+)
+print(f'Sell signal on {date} at {api.get_last_ trade("MRNA").price}')
+
+
+This code snippet checks the title of each FDA announcement. If the title indicates the approval of 
+a new drug/vaccine or a new indication for an existing drug, and 'moderna' is mentioned in the 
+title, it generates a buy signal. Conversely, if the title indicates regulatory rejection of a new 
+drug/vaccine or a critical safety concern is raised, and 'moderna' is mentioned in the title, it 
+generates a sell signal.
+Again, you need to replace the <ALPACA_API_KEY> and <ALPACA_SECRET_KEY> placeholder variables with 
+your actual API key and secret key from Alpaca. As before, keep in mind that this is a simplified 
+example and may not be sufficient for actual trading. Be sure to implement the necessary checks and 
+balances as per your trading strategy.
+10. Earnings reports (combined with sentiment signal to implement trade):
+• Buy: Quarterly revenue growth surpassing the consensus estimate by at least 10%
+• Sell: Quarterly revenue falls short of the consensus estimate by 10% or more
+• Source: IEX Cloud
+IEX Cloud offers the estimates endpoint, which provides future and past earnings estimates. You 
+could compare the actuals (which can be obtained from the income endpoint or the earnings endpoint) 
+with the estimates to see if Moderna’s earnings were more than 10% above or below the estimate.
+Here is a Python code example of how you might do this with IEX Cloud. This version of the code 
+uses the csv library to write the data to a file named Moderna_earnings.csv:
+import requests import json import csv
+
+# Replace 'YOUR_IEX_CLOUD_PUBLIC_KEY' with your actual IEX Cloud public key
+url_estimates = 'https://cloud.iexapis.com/stable/stock/mrna/ 
+estimates?token=YOUR_IEX_CLOUD_PUBLIC_KEY'
+url_income = 'https://cloud.iexapis.com/stable/stock/mrna/ income?token=YOUR_IEX_CLOUD_PUBLIC_KEY'
+
+response_estimates = requests.get(url_estimates) response_income = requests.get(url_income)
+
+data_estimates = json.loads(response_estimates.text) data_income = json.loads(response_income.text)
+
+# Initialize variables to None
+latest_estimate = actual = difference = percentage_difference = None
+
+
+
+# Check if 'estimates' and 'income' keys exist and if their lists are not empty
+if 'estimates' in data_estimates and len(data_ estimates['estimates']) > 0:
+latest_estimate = data_estimates['estimates'][0]. get('earnings', None)
+
+if 'income' in data_income and len(data_income['income']) > 0: actual = 
+data_income['income'][0].get('netIncome', None)
+
+# Perform calculations if both latest_estimate and actual are not None
+if latest_estimate is not None and actual is not None: difference = actual - latest_estimate
+# Check for a zero latest_estimate to avoid ZeroDivisionError
+if latest_estimate != 0:
+percentage_difference = (difference / latest_estimate) *
+
+
+100
+
+# Open the CSV file
+with open('Moderna_earnings.csv', 'w', newline='') as file: writer = csv.writer(file)
+# Write the header
+writer.writerow(["Estimate", "Actual", "Difference", "Percentage Difference"])
+
+# Write the data
+writer.writerow([latest_estimate, actual, difference, percentage_difference])
+
+print("Data has been written to Moderna_earnings.csv")
+11. R&D expenditure (combined with sentiment signal to implement trade):
+• Buy: R&D spending is consistent or slightly increasing (>=10%) YoY, indicating investment in the 
+future pipeline
+• Sell: A sudden drastic increase (greater than 20%) YoY in R&D spend
+• Source: IEX Cloud
+In the IEX Cloud API, the financials endpoint provides information about R&D costs and total 
+revenue for a specific period. To find R&D as a percentage of revenue, you can use the reportDate, 
+totalRevenue, and researchAndDevelopment fields from this endpoint.
+
+
+Please replace 'YOUR_IEX_CLOUD_PUBLIC_KEY' with your actual IEX Cloud public key in the following 
+code snippet:
+import requests import json import csv import schedule import time
+
+def job():
+# Replace 'YOUR_IEX_CLOUD_PUBLIC_KEY' with your actual IEX Cloud public key
+url_financials = 'https://cloud.iexapis.com/stable/stock/ 
+mrna/financials?token=YOUR_IEX_CLOUD_PUBLIC_KEY'
+
+response_financials = requests.get(url_financials) data_financials = 
+json.loads(response_financials.text)
+# Get total R&D and total revenue for the past 12 months total_rd = 0
+total_revenue = 0
+for report in data_financials['financials']:
+if 'reportDate' in report and int(report['reportDate'] [:4]) == time.localtime().tm_year - 1:
+if 'researchAndDevelopment' in report:
+total_rd += report['researchAndDevelopment'] if 'totalRevenue' in report:
+total_revenue += report['totalRevenue']
+
+# Calculate R&D as a percentage of revenue percentage_rd = (total_rd / total_revenue) * 100
+
+# Open the CSV file
+with open('Moderna_RD.csv', 'w', newline='') as file: writer = csv.writer(file)
+# Write the header
+writer.writerow(["Total R&D", "Total Revenue", "R&D as % of Revenue"])
+
+
+rd])
+
+
+# Write the data
+writer.writerow([total_rd, total_revenue, percentage_
+
+
+print("Data has been written to Moderna_RD.csv")
+
+if percentage_rd <= 10:
+print("Buy Signal: Moderna's R&D spend as a % of revenue for the past 12 months is no greater than 
+10%")
+elif percentage_rd >= 20:
+print("Sell Signal: Moderna's R&D spend as a % of revenue for the past 12 months exceeds 20%")
+else:
+print("No Signal: Moderna's R&D spend as a % of revenue for the past 12 months is between 10% and 
+20%")
+
+# Schedule the job every day at 9:00am schedule.every().day.at("09:00").do(job)
+
+# Keep the script running while True:
+schedule.run_pending() time.sleep(1)
+This script calculates the total R&D and total revenue for the past 12 months, then calculates R&D 
+as a percentage of revenue. After, it writes this data to a CSV file and prints a buy or sell 
+signal based on the value of R&D as a percentage of revenue. This job is scheduled to run every day 
+at 9:00 A.M.
+12. Sentiment analysis (combined with either the earnings signal or R&D spend signal to implement 
+trade):
+• Buy: The positive sentiment score exceeds 0.2 (on a scale from -1 to 1) for a consistent period 
+of a week
+• Sell: The negative sentiment score dips below -0.2 for a week consistently
+• Source: News and social media sentiment analyzed using GPT-4 or similar sentiment analysis tools, 
+which could be sourced from online news websites, Yahoo! Finance, and social media platforms such 
+as X:
+import schedule import time import csv import datetime
+from collections import deque from textblob import TextBlob import requests
+import json
+
+
+# Deque to keep the last 7 days sentiment scores sentiment_scores = deque(maxlen=7)
+
+def job():
+global sentiment_scores
+
+# Get news articles mentioning Moderna from newsapi.org url = ('https://newsapi.org/v2/everything?'
+'q=Moderna&'
+'from=' + datetime.datetime.now().isoformat() + 'Z&' # only get articles from the last 24 hours
+'sortBy=popularity&' 'apiKey=YOUR_NEWSAPI_KEY')
+
+response = requests.get(url) data = json.loads(response.text)
+
+# Initialize daily sentiment daily_sentiment = 0
+
+# Iterate over the articles
+for article in data['articles']:
+# Perform sentiment analysis on the article's title blob = TextBlob(article['title'])
+sentiment = blob.sentiment.polarity
+
+# Add the sentiment score to the daily sentiment daily_sentiment += sentiment
+
+# Save the daily sentiment to the deque sentiment_scores.append(daily_sentiment)
+
+# Calculate the sentiment score for the past week weekly_sentiment = sum(sentiment_scores)
+
+# Write the weekly sentiment to the CSV file
+with open('sentiment_scores.csv', 'a', newline='') as file: writer = csv.writer(file) 
+writer.writerow([datetime.date.today(), weekly_
+sentiment])
+
+# Generate a signal if the sentiment is consistently positive or negative for a week
+if weekly_sentiment > 0.2 * len(sentiment_scores):
+
+
+print("Buy signal")
+elif weekly_sentiment < -0.2 * len(sentiment_scores): print("Sell signal")
+schedule.every().day.at("10:00").do(job) while True:
+schedule.run_pending() time.sleep(1)
+This script keeps track of the daily sentiment scores for the last 7 days and writes the weekly 
+sentiment to a CSV file every day. It also generates a buy or sell signal if the weekly sentiment 
+exceeds 0.2 or falls below -0.2, respectively.
+Remember to replace 'YOUR_NEWSAPI_KEY' with your actual News API key. As always, this is a 
+simplified example and may not be sufficient for actual trading. You may need to adjust the 
+sentiment thresholds and the decision-making logic to fit your specific use case. Also, note that 
+the News API has certain limitations on the number of requests you can make, depending on your 
+level of subscription.
+13. Earnings reports and sentiment:
+• Buy: Quarterly revenue growth surpasses the consensus estimate by at least 10% and the positive 
+sentiment score exceeds 0.2 (on a scale from -1 to 1) for a consistent period of 1 week.
+• Sell: Quarterly revenue falls short of consensus estimate by 10% or more and the negative 
+sentiment score dips below -0.2 for 1 week:
+• Earnings report data and trade signal: Moderna_earnings.csv
+• Sentiment score and trade signal: sentiment_scores.csv
+To create a trading strategy based on multiple variables, you can combine the data from different 
+CSV files, process them to generate trading signals, and submit trades accordingly using Alpaca’s 
+API.
+The following script demonstrates how to achieve this using pandas. This script should be run after 
+the two CSV files, Moderna_earnings.csv and sentiment_scores.csv, have been generated:
+from alpaca_trade_api import REST import pandas as pd
+
+# Initialize Alpaca API
+api = REST('<ALPACA_API_KEY>', '<ALPACA_SECRET_KEY>', base_
+url='https://paper-api.alpaca.markets')
+
+
+# Load earnings and sentiment data
+df_earnings = pd.read_csv('Moderna_earnings.csv', index_ col='Date', parse_dates=True)
+df_sentiment = pd.read_csv('sentiment_scores.csv', index_ col='Date', parse_dates=True)
+
+# Join the two dataframes on the date index df = df_earnings.join(df_sentiment)
+
+# Iterate over each row in DataFrame for index, row in df.iterrows():
+earnings_signal = row['EarningsSignal'] sentiment_signal = row['SentimentSignal']
+
+# If earnings and sentiment signal both indicate "Buy", send buy order
+if earnings_signal == 'Buy' and sentiment_signal == 'Buy': api.submit_order(
+symbol='MRNA', qty='100', side='buy', type='market', time_in_force='gtc'
+
+
+)
+print(f'Buy signal on {index} at market price')
+
+# If earnings and sentiment signal both indicate "Sell", send sell order
+elif earnings_signal == 'Sell' and sentiment_signal == 'Sell':
+
+
+api.submit_order( symbol='MRNA', qty='100', side='sell', type='market', time_in_force='gtc'
+
+
+)
+print(f'Sell signal on {index} at market price')
+14. R&D spend and sentiment:
+• Buy: R&D spend is consistent or slightly increasing (>=10%) YoY and the positive sentiment score 
+exceeds 0.2 (on a scale from -1 to 1) for a consistent period of 1 week
+• Sell: A sudden drastic increase (greater than 20%) YoY in R&D spend and the negative sentiment 
+score dips below -0.2 for 1 week:
+
+
+• R&D spend as a % of revenue and trade signal: Moderna_RD.csv
+• Sentiment score and trade signal: sentiment_scores.csv:
+from alpaca_trade_api import REST import pandas as pd
+
+# Initialize Alpaca API
+api = REST('<ALPACA_API_KEY>', '<ALPACA_SECRET_KEY>', base_
+url='https://paper-api.alpaca.markets')
+
+# Load R&D spend and sentiment data
+df_rd_spend = pd.read_csv('Moderna_RD.csv', index_col='Date', parse_dates=True)
+df_sentiment = pd.read_csv('sentiment_scores.csv', index_ col='Date', parse_dates=True)
+
+# Join the two dataframes on the date index df = df_rd_spend.join(df_sentiment)
+
+# Iterate over each row in DataFrame for index, row in df.iterrows():
+rd_spend_signal = row['RDSpendSignal'] sentiment_signal = row['SentimentSignal']
+
+# If R&D spend and sentiment signal both indicate "Buy", send buy order
+if rd_spend_signal == 'Buy' and sentiment_signal == 'Buy': api.submit_order(
+symbol='MRNA', qty='100', side='buy', type='market', time_in_force='gtc'
+
+
+)
+print(f'Buy signal on {index} at market price')
+
+# If R&D spend and sentiment signal both indicate "Sell", send sell order
+elif rd_spend_signal == 'Sell' and sentiment_signal == 'Sell':
+
+
+api.submit_order( symbol='MRNA', qty='100', side='sell',
+
+
+38  Moderna and OpenAI – Biotech and AGI Breakthroughs
+
+
+
+type='market', time_in_force='gtc'
+)
+
+
+print(f'Sell signal on {index} at market price')
+Now, let’s look at a backtest example.
+To backtest the strategy you’ve described, you’ll need historical data for the period of June 30, 
+2022, through June 30, 2023, for all your variables – clinical trial data, FDA announcement data, 
+earnings report data, sentiment analysis data, and R&D spend data.
+Here’s a simplified example of how you might set up a backtest with Backtrader, assuming that you 
+have a pandas DataFrame, df, containing historical price data for Moderna and the buy/sell signals 
+generated from your combined variables:
+import backtrader as bt
+
+# Create a subclass of bt.Strategy to define the logic for trading class 
+ModernaStrategy(bt.Strategy):
+def next(self):
+# Get today's date
+date = self.data.datetime.date()
+
+# Check if there's a buy or sell signal for today if date in df.index:
+if df.loc[date, 'Signal'] == 'Buy': self.buy(size=100)
+elif df.loc[date, 'Signal'] == 'Sell': self.sell(size=100)
+
+# Create a Cerebro engine cerebro = bt.Cerebro()
+
+# Add the strategy to Cerebro cerebro.addstrategy(ModernaStrategy)
+
+# Create a data feed and add it to Cerebro data = bt.feeds.PandasData(dataname=df) 
+cerebro.adddata(data)
+
+# Run the backtest cerebro.run()
+
+
+This Python code snippet uses the Backtrader library to perform a backtest on a trading strategy 
+specifically for Moderna stock. Let’s break it down:
+1.  Import the Backtrader library using import backtrader as bt. This imports the Backtrader 
+library for use in backtesting trading strategies.
+2.  Define the trading strategy:
+class ModernaStrategy(bt.Strategy): def next(self):
+date = self.data.datetime.date() if date in df.index:
+if df.loc[date, 'Signal'] == 'Buy': self.buy(size=100)
+elif df.loc[date, 'Signal'] == 'Sell': self.sell(size=100)
+Let’s take a closer look at this code:
+• A custom trading strategy class, ModernaStrategy, is created, inheriting from bt.Strategy.
+• The next() method is implemented to specify the trading logic. Here, it checks for buy or sell 
+signals in a Pandas DataFrame (df) and then executes trades accordingly.
+3. Initialize the Backtrader engine:
+cerebro = bt.Cerebro() cerebro.addstrategy(ModernaStrategy)
+Let’s take a closer look:
+• A Backtrader engine (cerebro) is created
+• The custom strategy is added to the engine
+4. Add data and run the following:
+data = bt.feeds.PandasData(dataname=df) cerebro.adddata(data)
+cerebro.run()
+Let’s explain this code:
+• Data is fed into Backtrader using bt.feeds.PandasData, where df contains the historical price and 
+signal data
+• Finally, cerebro.run() kicks off the backtesting process
+
+In this section, we guided you through building the Moderna Momentum investment strategy by 
+combining traditional financial metrics with modern data science techniques. We set up your Python 
+environment and progressed by pulling data from various sources to craft multi-dimensional trading 
+signals. Finally, we wrapped things up with a backtest, giving you a comprehensive toolkit
+for biotech investing.
