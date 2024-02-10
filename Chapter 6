@@ -1,0 +1,1237 @@
+Obtain the Twitter API (if you don’t have one already)
+To obtain Twitter API credentials, you must first create a Twitter Developer account and create an 
+application. Here’s a step-by-step guide:
+1. Create a Twitter Developer account.
+• Navigate to the Twitter Developer’s site (https://developer.twitter.com/en/ apps).
+• Click Apply for a developer account.
+• Follow the prompts and provide the necessary information.
+2.  Create a new application:
+• After your developer account is approved, navigate to Dashboard and click on Create an app.
+• Fill out the required fields, such as App name, Application Description, and Website URL.
+
+
+• You will need Basic Level access to search tweets, which costs $100 a month. Free access does not 
+include the ability to search tweets, which is required to complete the following example.
+3.  Obtain your API keys:
+• After your application is created, you will be redirected to the app’s dashboard.
+• Navigate to the Keys and Tokens tab.
+• Here, you’ll find your API key and API secret key under the Consumer Keys section.
+• Scroll down, and you’ll see the Access token & access token secret section. Click on Generate
+to create your access token and access token secret.
+You’ll need all four of these keys (API Key, API Secret Key, Access Token, and Access Token Secret) 
+to interact with Twitter’s API programmatically.
+Important note
+Keep these keys confidential. Never expose them in client-side code or public repositories.
+
+4.  After obtaining these credentials, you can use them in your Python script to connect to the 
+Twitter API, like so:
+• Install the Tweepy library first:
+pip install tweepy
+• Run the following Python code:
+import tweepy
+
+consumer_key = 'YOUR_CONSUMER_KEY' consumer_secret = 'YOUR_CONSUMER_SECRET' access_token = 
+'YOUR_ACCESS_TOKEN' access_token_secret = 'YOUR_ACCESS_TOKEN_SECRET'
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret) auth.set_access_token(access_token, 
+access_token_secret)
+
+api = tweepy.API(auth)
+Replace 'YOUR_CONSUMER_KEY', 'YOUR_CONSUMER_SECRET', 'YOUR_
+ACCESS_TOKEN', and 'YOUR_ACCESS_TOKEN_SECRET' with your actual Twitter API credentials.
+
+
+
+Remember to follow Twitter’s policies and guidelines when using their API, including the 
+limitations they place on the number of requests your app can make in a given period.
+
+Data collection
+We’ll use Tweepy to access the Twitter API. This step requires your own Twitter Developer API keys:
+import tweepy
+
+# Replace with your own credentials consumer_key = 'YourConsumerKey' consumer_secret = 
+'YourConsumerSecret' access_token = 'YourAccessToken' access_token_secret = 'YourAccessTokenSecret'
+
+# Authenticate with Twitter
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret) auth.set_access_token(access_token, 
+access_token_secret)
+
+api = tweepy.API(auth)
+
+# Replace 'Silicon Valley Bank' with the name of the bank you want to research
+public_tweets = api.search('Silicon Valley Bank')
+
+# Loop to print each tweet text for tweet in public_tweets:
+print(tweet.text)
+
+Important note
+'Silicon Valley Bank' is the example name for the bank in the preceding Python code snippet. You 
+should replace this with the name of the bank you are interested in researching.
+
+In the provided Python code, the main objective is to connect to Twitter’s API and collect tweets 
+that mention a specific bank name.
+Here’s a breakdown of what the code accomplishes:
+• Obtaining the Twitter API credentials: Creating a Twitter Developer account and an application to 
+get API keys (a consumer key, consumer secret, access token, and access token secret).
+•  Importing the Tweepy Library: The tweepy library is imported to facilitate API interaction.
+
+
+•  Setting API credentials: Replacing placeholders such as 'YourConsumerKey' and 
+'YourConsumerSecret', with your actual API credentials. These keys authenticate your application 
+and provide access to Twitter’s API.
+•  Initializing OAuthHandler: Creating an OAuthHandler instance with your consumer key and consumer 
+secret. This object will handle authentication.
+•  Setting access tokens: Access tokens are set to complete the OAuth process, making your 
+application authorized to interact with Twitter on behalf of your account.
+•  Initializing an API object: Initializing the Tweepy API object with the authentication details.
+•  Collect tweets: Finally, tweets containing the name of a specific bank ('YourBankName') are 
+searched for and stored in the public_tweets variable.
+•  Adhering to Twitter policies: Be mindful of Twitter’s API usage policies and limitations on the 
+number of API calls.
+This code serves as a foundational step for any project requiring Twitter data related to banking 
+or financial institutions.
+
+Here is a Python script using the Tweepy library to access the Twitter API. This script finds 
+tweets with a specific hashtag and calculates a weighted sentiment score based on likes and 
+retweets:
+import tweepy
+from textblob import TextBlob
+# Twitter API credentials (you'll need to get these from your Twitter account)
+consumer_key = 'your-consumer-key' consumer_secret = 'your-consumer-secret' access_token = 
+'your-access-token' access_token_secret = 'your-access-token-secret'
+
+# Authenticate with the Twitter API
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret) auth.set_access_token(access_token, 
+access_token_secret) api = tweepy.API(auth)
+# Define the search term and the date_since date search_words = "#YourBankName"
+date_since = "2023-07-01"
+
+# Collect tweets
+tweets = tweepy.Cursor(api.search_tweets, # Updated this line q=search_words,
+lang="en", since=date_since).items(1000)
+# Function to get the weighted sentiment score def get_weighted_sentiment_score(tweet):
+likes = tweet.favorite_count retweets = tweet.retweet_count
+sentiment = TextBlob(tweet.text).sentiment.polarity
+
+
+# Here, we are considering likes and retweets as the weights. # You can change this formula as per 
+your requirements. return (likes + retweets) * sentiment
+
+# Calculate the total sentiment score
+total_sentiment_score = sum(get_weighted_sentiment_score(tweet) for tweet in tweets)
+
+print("Total weighted sentiment score: ", total_sentiment_score)
+
+This script retrieves tweets with a specific hashtag and then calculates a sentiment score for each 
+tweet, weighted by the number of likes and retweets. It sums up these weighted scores to give a 
+total sentiment score.
+Please note that Twitter’s API has rate limits, meaning that there’s a limit to the number of 
+requests you can make in a certain amount of time. You will need the Basic level of Twitter API 
+access to search tweets, which is $100 per month.
+Also, remember to replace 'YourBankName' with the actual name or hashtag that you are interested 
+in, and set ‘date_since’ to the date from which you want to start collecting tweets. Finally, 
+you’ll need to replace 'your-consumer-key', 'your-consumer-secret', 'your-access- token', and 
+'your-access-token-secret' with your actual Twitter API credentials.
+
+Tracking traditional indicators
+We’ll use yfinance, which allows you to download stock data:
+• Install the yfinance library first:
+pip install yfinance
+• Run the following Python code:
+import yfinance as yf
+
+data = yf.download('YourTickerSymbol','2023-01-01','2023-12-31')
+
+Formulating trading signals
+Let’s say that if the average sentiment score is positive and the stock price has increased, it’s a 
+buy signal. Otherwise, it’s a sell signal:
+1. Install NumPy:
+pip install numpy
+
+
+Harnessing the social pulse – the Sentinel Strategy for banking trading decisions  11
+
+
+
+2. Run the following Python code:
+import numpy as np
+
+# Ensure tweets is an array of numerical values if len(tweets) > 0 and np.all(np.isreal(tweets)):
+avg_sentiment = np.mean(tweets) else:
+avg_sentiment = 0 # or some other default value
+
+# Calculate the previous close prev_close = data['Close'].shift(1)
+
+# Handle NaN after shifting prev_close.fillna(method='bfill', inplace=True)
+
+# Create the signal
+data[‘signal’] = np.where((avg_sentiment > 0) & (data[‘Close’] > prev_close), ‘Buy’, ‘Sell’)
+
+The backtest strategy
+Backtesting requires historical data and simulation of the strategy performance. Let’s use SVB as 
+our backtest example:
+1.  Timeframe: March 8–March 10, 2023
+2. Stock symbol – SIVBQ (after the collapse in March 2023)
+3. Focus on tweets that mention or hashtag SVB, SIVB, or Silicon Valley Bank
+• Install pandas and textblob (if not already installed):
+pip install pandas pip install textblob
+• Run the following Python code:
+import pandas as pd import tweepy
+import yfinance as yf
+from textblob import TextBlob
+
+try:
+# Twitter API setup consumer_key = "CONSUMER_KEY"
+consumer_secret = "CONSUMER_SECRET"
+
+
+
+access_key = "ACCESS_KEY" access_secret = "ACCESS_SECRET"
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret) auth.set_access_token(access_key, 
+access_secret)
+api = tweepy.API(auth)
+
+# Hashtags and dates
+hashtags = ["#SVB", "#SIVB", "#SiliconValleyBank"] start_date = "2023-03-08"
+end_date = "2023-03-10"
+
+# Fetch tweets tweets = []
+for hashtag in hashtags:
+for status in tweepy.Cursor(api.search_tweets, q=hashtag, since=start_date, until=end_date, 
+lang="en").items():
+tweets.append(status.text)
+
+# Calculate sentiment scores
+sentiment_scores = [TextBlob(tweet).sentiment.polarity for tweet in tweets]
+
+# Generate signals
+signals = [1 if score > 0 else -1 for score in sentiment_ scores]
+
+# Fetch price data
+data = yf.download("SIVBQ", start=start_date, end=end_date)
+
+# Data alignment check
+if len(data) != len(signals):
+print("Data length mismatch. Aligning data.") min_length = min(len(data), len(signals)) data = 
+data.iloc[:min_length]
+signals = signals[:min_length]
+
+# Initial setup position = 0
+cash = 100000
+
+# Backtest
+for i in range(1, len(data)): if position != 0:
+
+
+
+cash += position * data['Close'].iloc[i] position = 0
+position = signals[i] * cash
+cash -= position * data['Close'].iloc[i]
+
+# Calculate returns
+returns = (cash - 100000) / 100000 print(f"Returns: {returns}")
+
+except Exception as e:
+print(f"An error occurred: {e}")
+
+Implementing the strategy
+You would typically use a broker’s API for this. However, implementing such a strategy requires 
+careful management of personal and financial information, as well as a good understanding of the 
+financial risks involved.
+As an example, we will use Alpaca, which is a popular broker that provides an easy-to-use API for 
+algorithmic trading.
+Note that to actually implement this code you will need to create an Alpaca account and replace 
+'YOUR_APCA_API_KEY_ID' and 'YOUR_APCA_API_SECRET_KEY' with your real Alpaca API key and secret:
+1.  Install the Alpaca Trade API:
+pip install alpaca-trade-api
+2. Run the following Python code:
+import alpaca_trade_api as tradeapi
+
+# Create an API object
+api = tradeapi.REST('YOUR_APCA_API_KEY_ID', 'YOUR_APCA_API_ SECRET_KEY', 
+base_url='https://paper-api.alpaca.markets')
+
+# Check if the market is open clock = api.get_clock()
+if clock.is_open:
+# Assuming 'data' is a dictionary containing the signal (Replace this with your actual signal data)
+signal = data.get('signal', 'Hold') # Replace 'Hold' with your default signal if 'signal' key is 
+not present
+
+if signal == 'Buy':
+
+
+api.submit_order( symbol='YourTickerSymbol', qty=100,
+side='buy', type='market', time_in_force='gtc'
+
+)
+elif signal == 'Sell': position_qty = 0 try:
+position_qty = int(api.get_ position('YourTickerSymbol').qty)
+except Exception as e:
+print(f"An error occurred: {e}")
+if position_qty > 0: api.submit_order(
+symbol='YourTickerSymbol', qty=position_qty, side='sell', type='market', time_in_force='gtc'
+)
+
+Here is a Python code snippet using the requests library to pull the CAR and bank name data:
+1.  Install the requests library (if not already installed).
+pip install requests
+2. Run the following Python code:
+import requests import json import csv
+# Replace YOUR_API_KEY with the API key you got from FRED api_key = 'YOUR_API_KEY'
+symbol = 'BANK_STOCK_SYMBOL' # Replace with the stock symbol of the bank
+bank_name = 'BANK_NAME' # Replace with the name of the bank
+
+# Define the API URL
+url = f"https://api.stlouisfed.org/fred/series/ 
+observations?series_id={symbol}&api_key={api_key}&file_ type=json"
+try:
+# Make the API request response = requests.get(url) response.raise_for_status()
+
+# Parse the JSON response
+data = json.loads(response.text) # Initialize CSV file
+csv_file_path = 'capital_adequacy_ratios.csv'
+
+
+with open(csv_file_path, 'w', newline='') as csvfile: fieldnames = ['Bank Name', 'Date', 'CAR']
+writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+# Write CSV header writer.writeheader()
+# Check if observations exist in the data if 'observations' in data:
+for observation in data['observations']:
+# Write each observation to the CSV file writer.writerow({'Bank Name': bank_name, 'Date':
+observation['date'], 'CAR': observation['value']}) else:
+print("Could not retrieve data.") except requests.RequestException as e:
+print(f"An error occurred: {e}")
+
+IMPORTANT
+Make sure to include your FRED API key, the stock symbol of the ban    t to research,
+and the name of the bank that matches the stock symbol you entered.
+
+The NLP component
+We will utilize Twitter sentiment analysis with weighted engagement as our secondary soft financial 
+indicator. Here’s an example of how you might set this up in Python:
+1. Install Twython package (if not already installed):
+pip install twython
+2. Run the following Python code:
+from twython import Twython from textblob import TextBlob
+# Assuming you are using TextBlob
+for sentiment analysis
+
+# Replace 'xxxxxxxxxx' with your actual Twitter API keys
+twitter = Twython('xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxxxx')
+
+def calculate_sentiment(tweet_text):
+# Example implementation using TextBlob
+return TextBlob(tweet_text).sentiment.polarity
+
+def get_weighted_sentiment(hashtags, since, until): try:
+# Replace twitter.search with twitter.search_tweets
+search = twitter.search_tweets(q=hashtags, count=100, lang='en', since=since, until=until)
+weighted_sentiments = []
+
+
+
+
+for tweet in search['statuses']:
+sentiment = calculate_sentiment(tweet['text']) weight = 1 + tweet['retweet_count'] +
+tweet['favorite_count']
+weighted_sentiments.append(sentiment * weight)
+
+if len(weighted_sentiments) == 0:
+return 0 # or handle it as you see fit
+
+return sum(weighted_sentiments) / len(weighted_ sentiments)
+
+except Exception as e:
+print(f"An error occurred: {e}") return None
+
+Portfolio rebalancing
+You can set up a routine in Python to perform the preceding actions periodically. This will 
+typically involve scheduling a task using libraries such as schedule or APScheduler.
+Here’s an example of how you might use the schedule library to periodically rebalance your 
+portfolio. This is a simple code snippet, and you would need to fill in the actual trading logic:
+1.  Install the schedule package first:
+pip install schedule
+2. Run the following Python code:
+import schedule import time
+
+def rebalance_portfolio(): try:
+# Here goes your logic for rebalancing the portfolio print("Portfolio rebalanced")
+except Exception as e:
+print(f"An error occurred during rebalancing: {e}")
+
+# Schedule the task to be executed every day at 10:00 am 
+schedule.every().day.at("10:00").do(rebalance_portfolio)
+
+while True: try:
+
+Harnessing the social pulse – the Sentinel Strategy for banking trading decisions  19
+# Run pending tasks schedule.run_pending() time.sleep(1)
+except Exception as e:
+print(f"An error occurred: {e}")
+In this example, the rebalance_portfolio function is scheduled to be run every day at 10:00 am. The 
+actual rebalancing logic should be placed inside the rebalance_portfolio function. The while True 
+loop at the end is used to keep the script running continuously, checking for pending tasks every 
+second.
+
+Risk management
+To set stop losses and take profit levels, you can add some additional logic to your trading 
+decisions:
+# Define the stop-loss and take-profit percentages stop_loss = 0.1
+take_profit = 0.2
+# Make sure buy_price is not zero to avoid division by zero errors if buy_price != 0:
+# Calculate the profit or loss percentage price_change = (price / buy_price) - 1
+
+# Check if the price change exceeds the take-profit level if price_change > take_profit:
+print("Sell due to reaching take-profit level.")
+
+# Check if the price change drops below the stop-loss level elif price_change < -stop_loss:
+print("Sell due to reaching stop-loss level.")
+
+
+else:
+print("Buy price is zero, cannot calculate price change.")
+
+In the provided Python code, multiple components are integrated to create a trading strategy based 
+on both hard financial data and Twitter sentiment. First, the script loads CAR data for a specific 
+bank from a CSV file, using the Pandas library. It then uses Twitter sentiment, weighted by 
+engagement metrics such as likes and retweets, as a secondary indicator. Based on these two factors 
+– CAR and weighted sentiment – the script triggers trading decisions to buy, sell, or hold. 
+Additionally, the code includes mechanisms for portfolio rebalancing, scheduled to run daily at 
+10:00 am, and risk management
+through stop losses and take-profit levels.
+
+Follow these Python code instructions:
+import pandas as pd import logging
+def save_df_to_csv(df: pd.DataFrame, file_path: str = 'my_data.csv'): # Check if DataFrame is empty
+if df.empty:
+logging.warning("The DataFrame is empty. No file was saved.") return
+try:
+# Save the DataFrame to a CSV file
+df.to_csv(file_path, index=False)
+
+
+logging.info(f"DataFrame saved successfully to {file_path}") except Exception as e:
+logging.error(f"An error occurred while saving the DataFrame to a CSV file: {e}")
+# Example usage
+# Assuming df contains your data
+# save_df_to_csv(df, 'my_custom_file.csv')
+
+This section provides instructions on how to create a web app named BankHealthMonitorAgent and 
+employs BabyAGI for task management. This agent can be used as a comprehensive, methodical way of 
+assessing a bank’s financial health. This section aims to demonstrate how multiple cutting-edge 
+technologies come together to create an accessible, robust tool for financial analysis:
+1.  Building the web app: Before starting, make sure you have signed up for Databutton, as it will 
+be the foundation for our web app development and deployment. Install the required dependencies – 
+langchain, openai, faiss-cpu, and tiktoken and streamlit.
+
+
+
+2.  Importing the installed dependencies: Import the necessary packages to build the web app:
+# Import necessary packages from collections import deque
+from typing import Dict, List, Optional
+
+import streamlit as st
+from langchain import LLMChain, OpenAI, PromptTemplate from langchain.embeddings.openai import 
+OpenAIEmbeddings from langchain.llms import BaseLLM
+from langchain.vectorstores import FAISS
+from langchain.vectorstores.base import VectorStore from pydantic import BaseModel, Field
+3.  Create the BankRegulatorGPT agent: Now, let’s define the BankRegulatorGPT agent using Langchain 
+and OpenAI GPT-4. The agent will be responsible for generating insights and recommendations, based 
+on the financial health monitoring results:
+class BankRegulatorGPT(BaseModel):
+"""BankRegulatorGPT - An intelligent financial regulation model."""
+
+@classmethod
+def from_llm(cls, llm: BaseLLM, verbose: bool = True) -> LLMChain:
+"""Get the response parser."""
+# Define the BankRegulatorGPT template bank_regulator_template = (
+"You are an intelligent financial regulation model, tasked with analyzing"
+" a bank's financial health using the following key indicators: {indicators}."
+" Based on the insights gathered from the BankHealthMonitorAgent, provide"
+" recommendations to ensure the stability and compliance of the bank."
+)
+prompt = PromptTemplate( template=bank_regulator_template, input_variables=["indicators"],
+
+
+
+)
+return cls(prompt=prompt, llm=llm, verbose=verbose)
+
+def provide_insights(self, key_indicators: List[str]) ->
+str:
+
+
+
+"""Provide insights and recommendations based on key indicators."""
+response = self.run(indicators=", ".join(key_ indicators))
+return response
+
+4.  Task Creation Agent: Create the Task Creation Agent class that generates new tasks, based on 
+insights obtained from BankHealthMonitorAgent:
+class TaskCreationChain(LLMChain): """Chain to generate tasks."""
+
+@classmethod
+def from_llm(cls, llm: BaseLLM, verbose: bool = True) -> LLMChain:
+"""Get the response parser."""
+# Define the Task Creation Agent template task_creation_template = (
+"You are a task creation AI that uses insights from the BankRegulatorGPT"
+" to generate new tasks. Based on the following insights: {insights},"
+" create new tasks to be completed by the AI
+
+
+system."
+
+)
+
+
+" Return the tasks as an array."
+
+
+prompt = PromptTemplate( template=task_creation_template, input_variables=["insights"],
+
+
+)
+return cls(prompt=prompt, llm=llm, verbose=verbose)
+
+def generate_tasks(self, insights: Dict) -> List[Dict]: """Generate new tasks based on insights.""" 
+response = self.run(insights=insights)
+new_tasks = response.split("\n")
+return [{"task_name": task_name} for task_name in new_ tasks if task_name.strip()]
+5.  Task Prioritization Agent: Implement the Task Prioritization Agent that reprioritizes the task 
+list:
+class TaskPrioritizationChain(LLMChain): """Chain to prioritize tasks."""
+
+@classmethod
+
+def from_llm(cls, llm: BaseLLM, verbose: bool = True) -> LLMChain:
+"""Get the response parser."""
+# Define the Task Prioritization Agent template task_prioritization_template = (
+"You are a task prioritization AI tasked with reprioritizing the following tasks:"
+" {task_names}. Consider the objective of your
+
+
+team:"
+" {objective}. Do not remove any tasks. Return the
+
+
+result as a numbered list,"
+" starting the task list with number {next_task_
+
+
+id}."
+
+
+)
+prompt = PromptTemplate( template=task_prioritization_template, input_variables=["task_names", 
+"objective", "next_
+
+
+task_id"],
+)
+return cls(prompt=prompt, llm=llm, verbose=verbose)
+
+def reprioritize_tasks(self, task_names: List[str], objective: str, next_task_id: int) -> 
+List[Dict]:
+"""Reprioritize the task list."""
+response = self.run(task_names=task_names, objective=objective, next_task_id=next_task_id)
+new_tasks = response.split("\n") prioritized_task_list = []
+for task_string in new_tasks: if not task_string.strip():
+continue
+task_parts = task_string.strip().split(".", 1) if len(task_parts) == 2:
+task_id = task_parts[0].strip() task_name = task_parts[1].strip()
+prioritized_task_list.append({"task_id": task_ id, "task_name": task_name})
+return prioritized_task_list
+6. Execution Agent: Implement the Execution Agent to execute tasks and get the results:
+class ExecutionChain(LLMChain): """Chain to execute tasks."""
+
+vectorstore: VectorStore = Field(init=False)
+
+@classmethod def from_llm(
+cls, llm: BaseLLM, vectorstore: VectorStore, verbose: bool = True
+) -> LLMChain:
+"""Get the response parser."""
+# Define the Execution Agent template execution_template = (
+"You are an AI who performs one task based on the following objective: {objective}."
+" Take into account these previously completed tasks: {context}."
+" Your task: {task}." " Response:"
+
+
+)
+prompt = PromptTemplate( template=execution_template,
+input_variables=["objective", "context", "task"],
+
+
+)
+return cls(prompt=prompt, llm=llm, verbose=verbose, vectorstore=vectorstore)
+
+def _get_top_tasks(self, query: str, k: int) -> List[str]: """Get the top k tasks based on the 
+query."""
+results = self.vectorstore.similarity_search_with_ score(query, k=k)
+if not results: return []
+sorted_results, _ = zip(*sorted(results, key=lambda x: x[1], reverse=True))
+return [str(item.metadata["task"]) for item in sorted_
+results]
+
+def execute_task(self, objective: str, task: str, k: int = 5) -> str:
+"""Execute a task."""
+context = self._get_top_tasks(query=objective, k=k) return self.run(objective=objective, 
+context=context,
+task=task)
+7.  BabyAGI Controller: Create the BabyAGI Controller model to manage tasks, executing the
+BabyAGI(BaseModel) class:
+class BabyAGI:
+"""Controller model for the BabyAGI agent."""
+
+def  init (self, objective, task_creation_chain, prioritization_chain, execution_chain):
+self.objective = objective self.task_list = deque()
+self.task_creation_chain = task_creation_chain
+
+task_
+
+
+chain
+
+
+self.task_prioritization_chain = task_prioritization_
+
+self.execution_chain = execution_chain self.task_id_counter = 1
+
+
+def add_task(self, task): self.task_list.append(task)
+
+def print_task_list(self): st.text("Task List")
+for t in self.task_list:
+st.write("- " + str(t["task_id"]) + ": " + t["task_
+
+
+name"])
+
+def print_next_task(self, task): st.subheader("Next Task:")
+st.warning("- " + str(task["task_id"]) + ": " + task["task_name"])
+
+def print_task_result(self, result): st.subheader("Task Result") st.info(result)
+
+def print_task_ending(self): st.success("Tasks terminated.")
+
+def run(self, max_iterations=None): """Run the agent."""
+num_iters = 0 while True:
+if self.task_list: self.print_task_list()
+
+# Step 1: Pull the first task task = self.task_list.popleft() self.print_next_task(task)
+
+# Step 2: Execute the task
+result = self.execution_chain.execute_task(self. objective, task["task_name"])
+
+
+this_task_id = int(task["task_id"]) self.print_task_result(result)
+
+# Step 3: Store the result
+result_id = f"result_{task['task_id']}" self.execution_chain.vectorstore.add_texts(
+texts=[result],
+metadatas=[{"task": task["task_name"]}], ids=[result_id],
+
+
+)
+
+
+list
+
+
+# Step 4: Create new tasks and reprioritize task new_tasks = self.task_creation_chain.generate_
+
+
+tasks(insights={"indicator1": "Insight 1", "indicator2": "Insight 2"})
+
+counter})
+tasks(
+
+for new_task in new_tasks: self.task_id_counter += 1 new_task.update({"task_id": self.task_id_
+self.add_task(new_task) self.task_list = deque(
+self.task_prioritization_chain.reprioritize_ [t["task_name"] for t in self.task_
+
+
+list], self.objective, this_task_id
+)
+
+
+iterations:
+
+)
+num_iters += 1
+if max_iterations is not None and num_iters == max_
+
+self.print_task_ending() break
+
+
+
+@classmethod
+def from_llm_and_objective(cls, llm, vectorstore, objective, first_task, verbose=False):
+"""Initialize the BabyAGI Controller.""" task_creation_chain = TaskCreationChain.from_llm(llm,
+verbose=verbose)
+task_prioritization_chain = TaskPrioritizationChain. from_llm(llm, verbose=verbose)
+execution_chain = ExecutionChain.from_llm(llm, vectorstore, verbose=verbose)
+controller = cls( objective=objective,
+
+
+
+task_creation_chain=task_creation_chain, task_prioritization_chain=task_prioritization_chain, 
+execution_chain=execution_chain,
+)
+
+task})
+
+
+controller.add_task({"task_id": 1, "task_name": first_ return controller
+
+
+8.  The Vectorstore: Now, let’s create the Vectorstore that will store the embeddings for task 
+execution:
+def initial_embeddings(openai_api_key, first_task): # Define your embedding model
+embeddings = OpenAIEmbeddings(
+openai_api_key=openai_api_key, model="text-embedding-
+ada-002"
+)
+
+vectorstore = FAISS.from_texts(
+["_"], embeddings, metadatas=[{"task": first_task}]
+
+
+)
+return vectorstore
+
+9.  The main UI: Finally, let’s build the main frontend to accept the objective from the user and 
+run the BankRegulatorGPT agent:
+def main():
+st.title("BankRegulatorGPT - Financial Health Monitor") st.markdown(
+"""
+An AI-powered financial regulation model that monitors a bank's financial health
+using Langchain, GPT-4, Pinecone, and Databutton. """
+
+
+)
+
+openai_api_key = st.text_input( "Insert Your OpenAI API KEY", type="password", placeholder="sk-",
+
+
+)
+
+if openai_api_key:
+OBJECTIVE = st.text_input( label="What's Your Ultimate Goal",
+
+
+value="Monitor a bank's financial health and provide recommendations.",
+)
+
+first_task = st.text_input( label="Initial task",
+value="Obtain the latest financial reports.",
+
+
+)
+
+max_iterations = st.number_input( " Max Iterations",
+value=3, min_value=1, step=1,
+
+
+)
+
+vectorstore = initial_embeddings(openai_api_key, first_
+task)
+
+
+if st.button("Let me perform the magic"): try:
+bank_regulator_gpt = BankRegulatorGPT.from_llm( llm=OpenAI(openai_api_key=openai_api_key)
+
+
+)
+baby_agi = BabyAGI.from_llm_and_objective( llm=OpenAI(openai_api_key=openai_api_key), 
+vectorstore=vectorstore, objective=OBJECTIVE, first_task=first_task,
+
+
+)
+
+with st.spinner("BabyAGI at work ..."): baby_agi.run(max_iterations=max_iterations)
+
+st.balloons() except Exception as e:
+st.error(e)
+
+if  name  == " main ": main()
+
+
+
+10. Add a stop button: To add the stop button, we’ll modify the BabyAGI class to include a flag 
+that indicates whether the agent should continue running or stop. We’ll also update the run method 
+to check this flag at each iteration and stop when the user clicks the Stop button:
+class BabyAGI(BaseModel):
+"""Controller model for the BabyAGI agent.""" # ... (previous code)
+def  init (self, *args, **kwargs): super(). init (*args, **kwargs) self.should_stop = False
+
+def stop(self):
+"""Stop the agent.""" self.should_stop = True
+
+def run(self, max_iterations: Optional[int] = None): """Run the agent."""
+num_iters = 0
+while not self.should_stop: if self.task_list:
+# ... (previous code)
+
+
+iterations:
+
+
+num_iters += 1
+if max_iterations is not None and num_iters == max_
+
+self.print_task_ending() break
+
+
+11. Update the main UI to include the stop button: Next, we need to add the Stop button in the main 
+user interface and oversee its functionality:
+def main():
+# ... (previous code)
+
+if openai_api_key:
+# ... (previous code)
+
+
+vectorstore = initial_embeddings(openai_api_key, first_
+task)
+
+
+baby_agi = None
+
+if st.button("Let me perform the magic"): try:
+bank_regulator_gpt = BankRegulatorGPT.from_llm( llm=OpenAI(openai_api_key=openai_api_key)
+
+
+)
+baby_agi = BabyAGI.from_llm_and_objective( llm=OpenAI(openai_api_key=openai_api_key), 
+vectorstore=vectorstore, objective=OBJECTIVE, first_task=first_task,
+
+)
+
+with st.spinner("BabyAGI at work ..."): baby_agi.run(max_iterations=max_iterations)
+st.balloons() except Exception as e:
+st.error(e)
+
+if baby_agi:
+if st.button("Stop"): baby_agi.stop()
+With these modifications, the web app now includes a Stop button that allows users to terminate the 
+BankRegulatorGPT agent’s execution at any time during its operation. When the user clicks the Stop 
+button, the agent will stop running, and the interface will display the final results. If the user 
+does not click the Stop button, the autonomous agent will continue running and performing tasks 
+until it either finishes all iterations or completes all tasks. If the user wants to stop the agent 
+before that, they can use the Stop button to do so.
+The web app allows users to input the bank’s stock symbol, and it interacts with the 
+BankRegulatorGPT agent, which utilizes Langchain and OpenAI GPT-4 to provide insights and 
+recommendations, based on the financial health monitoring results. The app also manages task 
+creation, prioritization, and execution using the BabyAGI Controller. Users can easily follow the 
+instructions, input their objectives, and run the BankRegulatorGPT agent without the need for deep 
+technical knowledge.
+
+BankRegulatorGPT evaluates a variety of financial indicators to deliver a comprehensive analysis of 
+a bank’s financial condition. This persona integrates several technologies, including Langchain for 
+internet search and mathematical computation, GPT-4 for language understanding and generation,
+Pinecone for vector search, and Databutton for an interactive web interface.
+
+Data collection:
+• Historical ETF data:
+• Required information: Historical price and volume data for the regional bank ETF and IAT
+• Here’s a Python code example:
+import yfinance as yf
+
+# Define the ETF symbol etf_symbol = "IAT"
+# Fetch historical data from Yahoo Finance
+etf_data = yf.download(etf_symbol, start="2022-06-30", end="2023-06-30")
+# Save ETF data to a CSV file etf_data.to_csv("IAT_historical_data.csv")
+• For the CRE vacancy rate data, we will use the quarterly office vacancy rates in the US from the 
+website Statista: (https://www.statista.com/statistics/194054/ 
+us-office-vacancy-rate-forecasts-from-2010/):
+• Install the following before running python code (if not installed:
+This code snippet will extract the quarterly office vacancy rates in the US for the specified time 
+period (June 30, 2022, to June 30, 2023) from the Statista website:
+import requests
+from bs4 import BeautifulSoup import pandas as pd
+# URL for the Statista website
+
+
+url = "https://www.statista.com/statistics/194054/us-office- vacancy-rate-forecasts-from-2010/"
+headers = {'User-Agent': 'Mozilla/5.0'} # Send a GET request to the URL
+response = requests.get(url, headers=headers) if response.status_code != 200:
+print("Failed to get URL") exit()
+
+# Parse the HTML content
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Find the table containing the vacancy rate data table = soup.find("table")
+if table is None:
+print("Could not find the table") exit()
+
+# Print the table to debug print("Table HTML:", table)
+
+# Extract the table data and store it in a DataFrame try:
+data = pd.read_html(str(table))[0] except Exception as e:
+print("Error reading table into DataFrame:", e) exit()
+
+# Print the DataFrame to debug print("DataFrame:", data)
+
+# Convert the 'Date' column to datetime format try:
+data["Date"] = pd.to_datetime(data["Date"]) except Exception as e:
+print("Error converting 'Date' column to datetime:", e) exit()
+
+# Filter data for the required time period (June 30, 2022, to June 30, 2023)
+start_date = "2022-06-30"
+end_date = "2023-06-30"
+
+
+filtered_data = data[(data["Date"] >= start_date) & (data["Date"] <= end_date)]
+
+# Print the filtered DataFrame to debug print("Filtered DataFrame:", filtered_data)
+
+# Save filtered CRE Vacancy Rate data to a CSV file 
+filtered_data.to_csv("CRE_vacancy_rate_data.csv")
+If you have potential issues that could result in an empty table, we have added print statements to 
+help identify where the potential issue might be so you can address it, such as the following:
+1.  The website’s structure may have changed, which would affect the Beautiful Soup selectors
+2.  The table may not exist on the page or may be loaded dynamically via JavaScript (which Python’s
+requests library won’t handle)
+3. The date range filtering might not be applicable to the data you have
+• Financial news, articles, and user comments data:
+Website: Yahoo Finance News (https://finance.yahoo.com/news/)
+To extract data from the Yahoo Finance news website, you can use the following Python code snippet:
+import requests
+from bs4 import BeautifulSoup import pandas as pd
+
+# URL for Yahoo Finance news website url = "https://finance.yahoo.com/news/"
+headers = {'User-Agent': 'Mozilla/5.0'} # Send a GET request to the URL
+response = requests.get(url, headers=headers) if response.status_code != 200:
+print("Failed to get URL") exit()
+
+# Parse the HTML content
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Find all the news articles on the page
+articles = soup.find_all("li", {"data-test": "stream-item"}) if not articles:
+
+print("No articles found.") exit()
+
+# Create empty lists to store the extracted data article_titles = []
+article_links = [] user_comments = []
+
+# Extract data for each article for article in articles:
+title_tag = article.find("h3") link_tag = article.find("a")
+title = title_tag.text.strip() if title_tag else "N/A" link = link_tag["href"] if link_tag else 
+"N/A" article_titles.append(title) article_links.append(link)
+
+# Extract user comments for each article
+comment_section = article.find("ul", {"data-test": "comment- section"})
+if comment_section:
+comments = [comment.text.strip() for comment in comment_ section.find_all("span")]
+user_comments.append(comments) else:
+user_comments.append([])
+
+# Create a DataFrame to store the data if article_titles:
+data = pd.DataFrame({
+"Article Title": article_titles, "Article Link": article_links, "User Comments": user_comments
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+})
+
+# Save financial news data to a CSV file data.to_csv("financial_news_data.csv")
+else:
+print("No article titles found. DataFrame not created.")
+If you have potential issues that could result in an empty string or DataFrame, we have added print 
+statements to help identify where the potential issue might be so you can address it, such as the 
+following.
+
+
+4.  The website structure may have changed, affecting the Beautiful Soup selectors
+5.  Some articles might not have a title, link, or user comments, resulting in “N/A” or empty 
+lists.
+6. The site’s content could be loaded dynamically via JavaScript, which the requests library won’t 
+handle.
+This code snippet will extract the article titles, links, and user comments from the Yahoo Finance 
+news website for references to the ETF, IAT, commercial real estate, or regional banks from June 
+30, 2022 to June 30, 2023. You can further store this data in a suitable format, such as CSV or 
+Excel, for later use in the trading strategy. Please note that web scraping should be done 
+responsibly and in compliance with the website’s terms of service.
+7.  Sentiment analysis using the OpenAI GPT API:
+• Required information: API key for OpenAI GPT-4 API
+• Website: OpenAI GPT-4 API (https://platform.openai.com/)
+• Python Code Snippet for Sentiment Analysis:
+• Installation required prior to running python code (if not already installed):
+pip install openai pip install pandas
+• Run python code below:
+import openai import pandas as pd
+
+# Initialize your OpenAI API key openai_api_key = "YOUR_OPENAI_API_KEY" openai.api_key = 
+openai_api_key
+
+# Function to get sentiment score using GPT-4 (hypothetical) def get_sentiment_score(text):
+# Make the API call to OpenAI GPT-4 (This is a placeholder; the real API call might differ)
+response = openai.Completion.create(
+engine="text-davinci-002", # Replace with the actual engine ID for GPT-4 when it becomes available
+prompt=f"This text is: {text}", max_tokens=10
+
+
+
+)
+
+# Assume the generated text contains a sentiment label e.g., "positive", "negative", or "neutral"
+
+
+sentiment_text = response['choices'][0]['text'].strip(). lower()
+
+# Convert the sentiment label to a numerical score if "positive" in sentiment_text:
+return 1
+elif "negative" in sentiment_text: return -1
+else:
+return 0
+
+# Load financial news data from the CSV file financial_news_data = 
+pd.read_csv("financial_news_data.csv")
+
+# Perform sentiment analysis on the article titles and user comments
+financial_news_data['Sentiment Score - Article Title'] = financial_news_data['Article 
+Title'].apply(get_sentiment_score)
+financial_news_data['Sentiment Scores - User Comments'] = financial_news_data['User 
+Comments'].apply(
+lambda comments: [get_sentiment_score(comment) for comment in eval(comments)]
+)
+
+# Calculate total sentiment scores for article titles and user comments
+financial_news_data['Total Sentiment Score - Article Title'] = financial_news_data['Sentiment Score 
+- Article Title'].sum()
+financial_news_data['Total Sentiment Scores - User Comments']
+= financial_news_data['Sentiment Scores - User Comments']. apply(sum)
+
+# Save the DataFrame back to a new CSV file with sentiment scores included
+financial_news_data.to_csv('financial_news_data_with_sentiment. csv', index=False)
+Ensure that you have the openai Python library installed and that you replace "YOUR_ 
+OPENAI_API_KEY" with your actual API key for the GPT-4 API. Additionally, make sure you have proper 
+permissions to use the API, and comply with the terms of service of the OpenAI GPT-4 API.
+This example assumes that the 'User Comments' column in your financial_news_ data.csv contains 
+lists of comments in the string format (e.g., "[comment1, comment2,
+...]"). The eval() function is used to convert these stringified lists back into actual Python 
+lists.
+
+
+
+8. Volatility indicator:
+• Required information: The historical price data of the regional bank ETF, IAT.
+• A Python code example:
+# Load ETF historical data from the CSV file etf_data = pd.read_csv("IAT_historical_data.csv")
+
+# Calculate historical volatility using standard deviation def calculate_volatility(etf_data):
+daily_returns = etf_data["Adj Close"].pct_change().dropna() volatility = daily_returns.std()
+return volatility
+
+# Calculate volatility for the IAT ETF volatility_iat = calculate_volatility(etf_data)
+Note that the IAT-historical_data.csv file contains historical data for the iShares US Regional 
+Banks ETF, represented by the acronym IAT. This data includes fields such as the adjusted close 
+price, which is used to calculate historical volatility. The Python code to generate this file was 
+provided at the bottom of page 41 and the top of page 42.
+Ensure that the Adj Close column exists in your CSV file and that the IAT_historical_ data.csv file 
+is in the same directory as your Python script, or provide the full path to the file.
+Incorporating volatility into the trading strategy:
+• Include the calculated volatility value as an additional variable in the trading strategy
+• Use the volatility information to adjust trading signals based on the level of market volatility
+• For example, consider higher volatility as an additional factor to generate buy/sell signals, or 
+adjust the holding period based on market volatility
+With the inclusion of the ETF’s historical volatility, the trading strategy can better capture and 
+respond to market fluctuations, thus making more informed trading decisions.
+9.  Trading strategy: To determine the thresholds for when to buy or sell the IAT ETF based on the 
+quarterly vacancy rate, sentiment score, and volatility, we can update the trading strategy code 
+snippet, as shown in the following Python code:
+# Implement the trading strategy with risk management
+def trading_strategy(cre_vacancy_rate, sentiment_score, volatility, entry_price):
+stop_loss_percent = 0.05 # 5% stop-loss level take_profit_percent = 0.1 # 10% take-profit level
+
+
+
+# Calculate stop-loss and take-profit price levels stop_loss_price = entry_price * (1 - 
+stop_loss_percent) take_profit_price = entry_price * (1 + take_profit_percent)
+
+if cre_vacancy_rate < 5 and sentiment_score > 0.5 and volatility > 0.2:
+return "Buy", stop_loss_price, take_profit_price elif cre_vacancy_rate > 10 and sentiment_score < 
+0.3 and
+volatility > 0.2:
+return "Sell", stop_loss_price, take_profit_price else:
+return "Hold", None, None
+
+# Sample values for demonstration purposes cre_vacancy_rate = 4.5
+sentiment_score = 0.7
+volatility = 0.25
+entry_price = 100.0
+
+# Call the trading strategy function
+trade_decision, stop_loss, take_profit = trading_strategy(cre_ vacancy_rate, sentiment_score, 
+volatility, entry_price)
+
+print("Trade Decision:", trade_decision) print("Stop-Loss Price:", stop_loss) print("Take-Profit 
+Price:", take_profit)
+In this updated code snippet, we use cre_vacancy_rate, sentiment_score, and volatility as the input 
+parameters for the trading strategy function. The trading strategy checks these key variables 
+against specific thresholds to decide on whether to buy (“go long”), sell (“go short”), or hold the 
+IAT ETF.
+Note that the thresholds used in this example are arbitrary and may not be suitable for actual 
+trading decisions. In practice, you would need to conduct thorough analysis and testing to 
+determine appropriate thresholds for your specific trading strategy. Additionally, consider 
+incorporating risk management and other factors into your trading strategy for more robust 
+decision-making.
+Now, based on the provided sample values for cre_vacancy_rate, sentiment_score, and volatility, the 
+code will determine the trade decision (buy, sell, or hold) for the IAT ETF.
+10. Risk management and monitoring: Here, you define the stop-loss and take-profit levels to manage 
+risk.
+You can set specific stop-loss and take-profit levels based on your risk tolerance and trading 
+strategy. For example, you might set a stop-loss at a certain percentage below the entry price
+
+
+to limit potential losses, and a take-profit level at a certain percentage above the entry price to 
+lock in profits:
+import pandas as pd
+
+# Define the trading strategy function
+def trading_strategy(cre_vacancy_rate, sentiment_score, volatility, entry_price):
+stop_loss_percent = 0.05 # 5% stop-loss level take_profit_percent = 0.1 # 10% take-profit level
+
+# Calculate stop-loss and take-profit price levels stop_loss_price = entry_price * (1 - 
+stop_loss_percent) take_profit_price = entry_price * (1 + take_profit_percent)
+
+if cre_vacancy_rate < 5 and sentiment_score > 0.5 and volatility > 0.2:
+return "Buy", stop_loss_price, take_profit_price elif cre_vacancy_rate > 10 and sentiment_score < 
+0.3 and
+volatility > 0.2:
+return "Sell", stop_loss_price, take_profit_price else:
+return "Hold", None, None
+
+# Sample values for demonstration purposes cre_vacancy_rate = 4.5
+sentiment_score = 0.7
+volatility = 0.25
+entry_price = 100.0
+
+# Call the trading strategy function
+trade_decision, stop_loss, take_profit = trading_strategy(cre_ vacancy_rate, sentiment_score, 
+volatility, entry_price)
+
+# Create a DataFrame to store the trading strategy outputs output_data = pd.DataFrame({
+"CRE Vacancy Rate": [cre_vacancy_rate], "Sentiment Score": [sentiment_score], "Volatility": 
+[volatility],
+"Entry Price": [entry_price], "Trade Decision": [trade_decision], "Stop-Loss Price": [stop_loss], 
+"Take-Profit Price": [take_profit]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+})
+
+# Save the trading strategy outputs to a CSV file 
+output_data.to_csv("trading_strategy_outputs.csv", index=False)
+In this updated code snippet, we have introduced the stop_loss_percent and take_ profit_percent 
+variables to set the desired stop-loss and take-profit levels as percentages. The trading strategy 
+calculates the stop-loss and take-profit price levels based on these percentages, and the 
+entry_price.
+Note
+The specific stop-loss and take-profit levels provided in this example are for demonstration 
+purposes only. You should carefully consider your risk management strategy and adjust these levels 
+according to your trading goals and risk appetite.
+
+Now, the trading strategy function returns the trade decision (buy, sell, or hold) along with the 
+calculated stop-loss and take-profit price levels, based on the provided sample values for 
+cre_vacancy_rate, sentiment_score, volatility, and entry_price.
+This section laid out a five-step process to build a trading strategy for a Regional Bank ETF, 
+using the CRE vacancy rate and sentiment analysis data. First, we identified the required data 
+sources and displayed how to collect this data using Python. Then, we explained how to use the 
+OpenAI GPT API for sentiment analysis of financial news and comments. Subsequently, we incorporated 
+the volatility of the ETF into the trading strategy. The fourth step involved forming the trading 
+strategy with thresholds for buy/sell decisions, based on the CRE vacancy rate, sentiment score, 
+and volatility. Finally, we discussed the importance of risk management and continuous monitoring 
+of the relevant factors. It’s crucial to remember that this strategy is simplified and intended for 
+educational purposes, and it does not assure profitable results. Professional advice should be 
+sought for real-world trading.
+
+Note
+This trading strategy is a simplified example for educational purposes only and does not guarantee 
+profitable results. Real-world trading involves complex factors and risks, and it’s erform thorough 
+research and consult with financial experts before making any
+ent decisions.
