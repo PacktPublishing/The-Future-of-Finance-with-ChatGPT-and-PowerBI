@@ -1,0 +1,1042 @@
+Leveraging AI and sentiment – Salesforce sentiment-
+adjusted options straddle
+Creating a strategy combining AI-powered CRM evolution with a sentiment-adjusted straddle strategy 
+would involve monitoring the sentiment regarding Salesforce’s AI-powered CRM evolution and setting 
+up options trades based on that sentiment.
+A sentiment-adjusted straddle strategy involves buying a call option and a put option with the same 
+expiry date but different strike prices, which you adjust based on the sentiment.
+This is a simplified overview of the steps to implement the strategy using Python, considering that 
+you have access to options pricing data and sentiment analysis results:
+1.  Set up your environment: Start by setting up your Python environment and importing the 
+necessary libraries. If you don’t have Python and pip installed, you should do that first. Once you 
+have Python set up, you can install the libraries using pip, the Python package installer. Open up 
+your command prompt or terminal and type the following commands:
+pip install pandas yfinance matplotlib nltk requests
+Once the installation is done, import the necessary libraries in your Python script:
+import pandas as pd import yfinance as yf
+import matplotlib.pyplot as plt
+from nltk.sentiment.vader import SentimentIntensityAnalyzer import requests
+import datetime as dt
+
+2.  Get options data: You can use the yfinance library to get the options data for Salesforce. Here 
+is a sample code for this:
+# specify the ticker symbol and get the data
+data = yf.Ticker('CRM')
+
+
+
+# Get options expiring on December 15, 2023 options = data.option_chain('2023-12-15') calls = 
+options.calls
+puts = options.puts
+
+3. Data collection: Here, we’ll use the Marketaux API to extract financial news for CRM. To sign 
+up, visit Marketaux’s website at https://www.marketaux.com/ and click on GET FREE API KEY to sign 
+up for a free API key1.
+Here is the API call:
+import requests
+
+def get_marketaux_news():
+url = 'https://marketaux.com/api/v1/news' # Update this if the endpoint is different
+params = {
+'apikey': 'your-api-key-here', 'ticker': 'CRM'
+
+
+}
+response = requests.get(url, params=params) return response.json()
+
+news_data = get_marketaux_news()
+Replace 'your-api-key-here' with the Marketaux API key you received upon signing up. Now, you can 
+call get_marketaux_news() to get the financial news for CRM.
+4. Data labeling: Here, we’ll use the MarketAux API to extract financial news for CRM.
+To automatically label the data, we can use NLP techniques. Python’s NLTK library, along with other 
+popular libraries such as TextBlob, can be utilized to determine the polarity of a text. This is a 
+simple sentiment analysis. However, please note that this kind of automatic sentiment analysis 
+might not always be perfect and could have its own inaccuracies:
+from textblob import TextBlob
+
+def label_sentiment(text): analysis = TextBlob(text)
+if analysis.sentiment.polarity > 0: return 1
+elif analysis.sentiment.polarity < 0: return -1
+else:
+return 0
+
+
+
+# Example usage:
+text = "Salesforce had an amazing quarter with record profits." label = label_sentiment(text)
+print(label) # Outputs: 1
+In this script, the label_sentiment function receives a piece of text as input, calculates its 
+sentiment polarity using TextBlob, and then returns a label: 1 for positive sentiment, -1 for 
+negative sentiment, and 0 for neutral sentiment.
+Now, suppose you’ve extracted a list of news articles about Salesforce. You could then use the
+label_sentiment function to automatically assign a sentiment label to each article, like so:
+# Assume `articles` is a list of articles about Salesforce for article in articles:
+label = label_sentiment(article)
+print(f"Article: {article[:50]}... Label: {label}")
+Remember, this automated sentiment labeling method is quite simple and might not be perfectly 
+accurate, particularly for complex or nuanced texts. For a more sophisticated sentiment analysis 
+model, you could look into using machine learning techniques and training a model on a pre-labeled 
+financial sentiment dataset.
+As for manually labeling data that the automated process can’t handle, you could simply present 
+those texts to the user and ask for their input, like so:
+for article in articles:
+label = label_sentiment(article)
+if label == 0: # If the automated process labels the text as neutral
+print(f"Article: {article}")
+user_label = input("Is this article positive (1), negative (-1), or neutral (0)? ")
+# Then store the user's label somewhere for later use
+This will allow users to provide their own sentiment labels for texts that the automated process 
+labels as neutral, further improving your sentiment analysis capabilities over time. Remember that 
+you’d need a way to store these user-provided labels in a database or other persistent storage 
+system for future use.
+5.  Dataset creation for pre-labeled data: A good option for storing this kind of data is a 
+relational database such as SQLite, which can be easily accessed and manipulated with Python using 
+the sqlite3 module.
+The following is a step-by-step guide on how to create an SQLite database and store your labeled 
+sentiment analysis data:
+I.  Import the required libraries:
+import sqlite3
+from sqlite3 import Error
+
+
+
+II.  Create a connection to the SQLite database. If the database does not exist, it will be 
+created:
+def create_connection(): conn = None;
+try:
+conn = sqlite3.connect('sentiment_analysis.db') # Creates a SQLite database named 
+'sentiment_analysis.db'
+print(f'successful connection with sqlite version
+{sqlite3.version}') except Error as e:
+print(f'Error {e} occurred') return conn
+conn = create_connection()
+III.  Create a table to store the sentiment analysis data:
+def create_table(conn): try:
+query = '''
+CREATE TABLE IF NOT EXISTS sentiment_data ( id integer PRIMARY KEY,
+article text NOT NULL, sentiment integer NOT NULL
+
+
+);
+'''
+
+
+
+conn.execute(query)
+print('Table created successfully') except Error as e:
+print(f'Error {e} occurred')
+
+create_table(conn)
+IV.  Insert the labeled sentiment analysis data into the database:
+def insert_data(conn, data): try:
+query = '''
+INSERT INTO sentiment_data(article, sentiment)
+
+
+
+VALUES(?,?)
+'''
+conn.execute(query, data) conn.commit()
+print('Data inserted successfully') except Error as e:
+
+
+
+
+print(f'Error {e} occurred')
+
+# Let's assume that the sentiment_data list contains tuples of articles and their respective 
+sentiment
+sentiment_data = [("Salesforce announces record profits", 1), ("Salesforce's latest product failed 
+to impress", -1)]
+
+for data in sentiment_data: insert_data(conn, data)
+V.  Retrieve data from the database:
+def fetch_data(conn): try:
+query = 'SELECT * FROM sentiment_data' cursor = conn.execute(query)
+rows = cursor.fetchall()
+
+for row in rows: print(row)
+except Error as e:
+print(f'Error {e} occurred')
+
+fetch_data(conn)
+The fetch_data function will print all the entries in the database. You can modify it to filter or 
+sort the data based on your requirements.
+VI.  Remember to close the connection after you are done with all database operations:
+conn.close()
+This is a simple way to store sentiment analysis data.
+6.  Analyze sentiment: To perform sentiment analysis on your data stored in the SQLite database, 
+you can follow the sub-steps outlined as follows.
+In this example, we are going to extract the data from the SQLite database and apply a Bag of Words 
+(BoW) approach with Term Frequency-Inverse Document Frequency (TF-IDF) feature extraction, followed 
+by Logistic Regression for sentiment classification:
+I.  Extract the data from the SQLite database:
+import sqlite3 import pandas as pd
+
+def fetch_data():
+
+
+
+conn = sqlite3.connect('sentiment_analysis.db') query = 'SELECT * FROM sentiment_data'
+df = pd.read_sql_query(query, conn) conn.close()
+return df
+
+df = fetch_data()
+II.  Split the data into training and testing sets:
+from sklearn.model_selection import train_test_split
+
+X = df['article']
+y = df['sentiment']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_ size=0.2, random_state=42)
+III.  Apply the BoW approach with TF-IDF for feature extraction:
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizer = TfidfVectorizer(use_idf=True, max_df=0.95) X_train_vectorized = 
+vectorizer.fit_transform(X_train)
+IV.  Train a Logistic Regression model for sentiment classification:
+Python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression() model.fit(X_train_vectorized, y_train)
+V.  Transform your test data and predict the sentiment:
+X_test_vectorized = vectorizer.transform(X_test) y_pred = model.predict(X_test_vectorized)
+VI. Evaluate the model’s performance:
+from sklearn.metrics import classification_report print(classification_report(y_test, y_pred))
+This code will train a logistic regression model on your sentiment-labeled news articles. The 
+classification report will show you the performance of your model, including metrics such as 
+precision, recall, and F1-score.
+
+
+Remember, the success of the model depends on the quality and size of your labeled data. Also, text 
+data often require some preprocessing, such as lowercasing, punctuation removal, and lemmatization 
+or stemming, to improve the results of the model. You might need to experiment with these steps to 
+achieve the best results.
+7.  Create dataframes for Salesforce put and call data: You can use the yfinance library to 
+download option chain data for Salesforce. Here is an example of how to do that:
+import yfinance as yf
+
+# Define the ticker symbol ticker = yf.Ticker('CRM')
+
+# Get options expirations expiry_dates = ticker.options
+
+# Create empty dataframes to store calls and puts calls = pd.DataFrame()
+puts = pd.DataFrame()
+
+# Loop through all expiry dates and download option chain data for expiry in expiry_dates:
+# Check if the expiry is in the desired range (June 30, 2023 – December 15, 2023)
+expiry_date = pd.to_datetime(expiry) start_date = pd.to_datetime('2023-06-30') end_date = 
+pd.to_datetime('2023-12-15')
+
+if start_date <= expiry_date <= end_date: option_chain = ticker.option_chain(expiry) # Add the 
+expiry date to the dataframes option_chain.calls['expiry'] = expiry_date 
+option_chain.puts['expiry'] = expiry_date # Append the data to the main dataframes calls = 
+calls.append(option_chain.calls) puts = puts.append(option_chain.puts)
+
+# Reset the index of the dataframes calls.reset_index(drop=True, inplace=True) 
+puts.reset_index(drop=True, inplace=True)
+
+print("Calls Data:") print(calls.head()) print("\nPuts Data:") print(puts.head())
+
+
+
+This script will create two dataframes, calls and puts, which contain the call and put options for 
+Salesforce’s stock for the desired time period, respectively. Each row in the dataframes represents 
+an option contract, and the columns represent different characteristics of the options such as the 
+strike price (strike), the option’s price (lastPrice), the implied volatility (impliedVolatility), 
+and so on.
+The last example is a basic illustration aimed at providing sentiment analysis for financial news 
+and option pricing. It does not take into account complex market dynamics such as market- implied 
+volatility and historical volatility, which can significantly influence outcomes. While this 
+example serves as a foundation, real-world scenarios demand a more thorough analysis to accurately 
+depict market behaviors and outcomes.
+Volatility, a key metric in options trading, gauges the degree of price fluctuations of an 
+underlying asset, impacting option prices. Two principal types of volatility, Historical Volatility 
+(HV) and Implied Volatility (IV) play critical roles in options trading. Higher volatility usually 
+results in higher option premiums due to increased uncertainty, aiding traders in evaluating the 
+relative cost of an option and potential price movement, and in strategizing accordingly.
+Keep in mind that this script may take a while to run, depending on the number of expiration dates 
+for the options. Also, note that the actual structure and content of the option chain data may vary 
+depending on the data source and market conditions. Always check the data and adjust your script as 
+needed.
+8.  Choose strike prices based on the sentiment, and choose your strike prices for the call and put 
+options: A straightforward way of doing this would be to take the mean (average) strike price of 
+all available options as a starting point, and then adjust upward or downward based on sentiment. 
+If the sentiment is positive, choose a call strike price higher than the mean and a put strike 
+price lower than the mean. If the sentiment is negative, choose a call strike price lower than the 
+mean and a put strike price higher than the mean:
+# Compute mean strike price for calls and puts mean_call_strike = calls['strike'].mean() 
+mean_put_strike = puts['strike'].mean()
+
+# Factor to adjust the strike prices. This can be tweaked based on how strongly you want to react 
+to the sentiment
+adjustment_factor = 0.05
+
+if average_sentiment > 0:
+# Sentiment is positive, lean bullish
+call_strike = mean_call_strike * (1 + adjustment_factor) #
+Choose a call strike higher than mean
+put_strike = mean_put_strike * (1 - adjustment_factor) #
+Choose a put strike lower than mean else:
+
+
+
+# Sentiment is negative, lean bearish
+call_strike = mean_call_strike * (1 - adjustment_factor) #
+Choose a call strike lower than mean
+put_strike = mean_put_strike * (1 + adjustment_factor) #
+Choose a put strike higher than mean
+
+# Round the strike prices to the nearest available strike
+call_strike = calls.iloc[(calls['strike']-call_strike).abs(). argsort()[:1]]
+put_strike = puts.iloc[(puts['strike']-put_strike).abs(). argsort()[:1]]
+
+print("Chosen Call Strike Price:", call_strike) print("Chosen Put Strike Price:", put_strike)
+
+Note
+Please note that adjustment_factor is somewhat arbitrary in this example. The script adjusts the 
+mean strike price by 5% upward or downward based on sentiment. This parameter can be tweaked based 
+on how strongly you want your options strategy to react to the sentiment analysis results. A higher 
+value will result in more aggressive adjustments, while a lower value will result in more 
+conservative adjustments.
+
+The calls dataframe stores information about the available call options for Salesforce. The 
+mean_call_strike is calculated using the “strike” column of this dataframe. Then, based on the 
+sentiment analysis, a call strike price is chosen that is either higher or lower than this mean.
+The puts dataframe stores information about the available put options for Salesforce. The 
+mean_put_strike is calculated using the “strike” column of this dataframe. Then, based on the 
+sentiment analysis, a put strike price is chosen that is either higher or lower than this mean.
+The final chosen strike prices (call_strike and put_strike) are then printed.
+9.  Set up the straddle options trade: Here is an example of buying the options by selecting the 
+rows in our call and put dataframes that correspond to our chosen strike prices and then storing 
+that information:
+# Select the option data for the chosen call and put strike prices
+chosen_call_option = calls.loc[calls['strike'] == call_strike] chosen_put_option = 
+puts.loc[puts['strike'] == put_strike]
+
+# Print the details of the options you are "buying" print("Buying Call Option") 
+print(chosen_call_option)
+print("\nBuying Put Option") print(chosen_put_option)
+
+
+In this example, chosen_call_option and chosen_put_option are the dataframes that contain the 
+information of the call and put options we are “buying,” respectively.
+Note
+Please note that the preceding code is a simple representation of buying an option; it doesn’t 
+actually execute a trade. In a live trading environment, you would use a broker’s API to execute 
+these trades, which usually involves providing your account information and confirming your
+iated with trading options. Always be sure to thoroughly s before attempting to trade options.
+
+. Monitor and adjust trade as necessary (use Power BI visualization): The steps to visualize the 
+options data and sentiment data stored in an SQLite database and pandas DataFrames using Power BI 
+would be as follows:
+I.   Export the DataFrames to CSV: The first step is to export the calls and puts dataframes into 
+CSV files. You can do this in Python using the pandas to_csv function:
+calls.to_csv('calls.csv', index=False) puts.to_csv('puts.csv', index=False)
+II.
+Export the SQLite data to CSV: Next, you’ll need to export the data stored in your SQLite database 
+to a CSV file. Here’s how you can do that in Python:
+import pandas as pd import sqlite3
+# Create a connection to the SQLite database con = sqlite3.connect('sentiment_analysis.db')
+# Read the data from the SQLite database into a pandas DataFrame df = pd.read_sql_query("SELECT * 
+from sentiment_table", con)
+# Export the DataFrame to a CSV file df.to_csv('sentiment.csv', index=False)
+
+# Don't forget to close the SQLite connection con.close()
+III.  Replace sentiment_table with the actual name of your table in the SQLite database.
+
+Here’s a general illustration of how the Python code might look using Salesforce Q3 2022 to Q1 2024
+data. We’ll use pandas, a powerful data manipulation library in Python:
+1. Calculate the Rule of 40 for historical information:
+import pandas as pd data = {
+"Quarter": ["Q3 2023", "Q4 2023", "Q1 2024"],
+"Revenue Growth": [0.14, 0.14, 0.11],
+"FCF Margin": [0.014, 0.299, 0.507],
+"Stock Price": [128.27, 167.35, 223.38]
+
+
+}
+
+df = pd.DataFrame(data)
+# Calculate Rule of 40
+df["Rule of 40"] = df["Revenue Growth"] + df["FCF Margin"]
+*Stock prices are the closing price at the end of the following trading days – lowest price in 2022 
+after Q3 2023 earnings call – 12/16/22, March 1, 2023 and May 31, 2023
+
+2.  Extract articles and comments about Salesforce from a news website for a historical period – 
+the BeautifulSoup option.
+Here’s an example of how you might use the BeautifulSoup library in Python to scrape comments from 
+a hypothetical news website:
+import requests
+from bs4 import BeautifulSoup
+# URL of the news article
+url = 'https://www.newswebsite.com/salesforce_article'
+# Send a GET request response = requests.get(url)
+# Parse the HTML content of the page with BeautifulSoup soup = BeautifulSoup(response.content, 
+'html.parser')
+
+# Find the comments. The details of how to do this will depend
+on how the website is structured.
+
+
+
+# Here we're assuming each comment is in a div with the class 'comment'
+comments = soup.find_all('div', class_='comment')
+
+# Extract the text of each comment
+comment_texts = [comment.get_text() for comment in comments]
+
+# Now comment_texts is a list of the text of each comment
+Keep in mind this is a simplified example and the real implementation can get very complex very 
+quickly due to the unstructured and often messy nature of HTML on the web. Furthermore, the 
+complexity increases if you want to extract information from multiple websites since each one will 
+have different structures and classes.
+To collect data from other sources such as Twitter, you may need to use APIs. Twitter provides APIs 
+for accessing tweets and other data, but you’ll need to apply for access and comply with its usage 
+policies.
+Once you’ve collected these comments, you can analyze their sentiment in the same way as the news 
+headlines in the previous example. Note that comments can be more challenging to analyze due to the 
+informal language often used, and you may need more sophisticated NLP tools.
+For more advanced readers, here is an example of a sophisticated NLP tool to assist with sentiment 
+analysis for comments.
+3.  Gauge market sentiment for Salesforce for a historical period – the VaderSentiment option.
+To gauge market sentiment, we could use NLP libraries in Python such as VaderSentiment. This 
+involves extracting textual data from financial news and social media posts and then analyzing the 
+sentiment of this text.
+Here is a simplified demonstration of how to gauge sentiment from news headlines using the
+VaderSentiment library.
+First, you’d need to pull in the news data. There are numerous ways you could do this, and the 
+approach you’d take would depend on the source of your news. If you’re pulling news from websites, 
+you might use a web scraping tool such as BeautifulSoup. If you’re using a service that provides an 
+API, you would fetch the data that way.
+Let’s assume you have a list of news headlines and their dates stored in a dataframe called
+news_df. It might look something like this:
+news_data = {
+'Date': ['2022-11-30', '2022-12-01', '2022-12-02', '2023-10-
+15'],
+'Headline': [
+'Salesforce announces record earnings',
+
+
+
+'Analysts concerned about Salesforce growth', 'Salesforce acquires new startup, boosting 
+portfolio', 'Salesforce struggles to meet this quarter earnings
+expectation',
+],
+
+
+}
+news_df = pd.DataFrame(news_data)
+news_df['Date'] = pd.to_datetime(news_df['Date'])
+Use the VaderSentiment library to analyze the sentiment of each news headline. You’d add this data 
+as a new column to your dataframe:
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyzer = SentimentIntensityAnalyzer() def get_sentiment(score):
+if score < -0.05: return "Negative"
+elif score > 0.05: return "Positive"
+else:
+return "Neutral"
+
+news_df['Sentiment'] = news_df['Headline'].apply(lambda headline: 
+get_sentiment(analyzer.polarity_scores(headline) ['compound']))
+We need to look at the sentiment over time. You might want to look at the overall sentiment for 
+each day (from November 30, 2022 to June 30, 2023):
+sentiment_over_time = news_df.groupby('Date')['Sentiment']. value_counts().unstack().fillna(0)
+This will give you a new dataframe called sentiment_over_time, which shows you how many of each 
+sentiment (positive, negative, and neutral) there were for each day.
+Please note that this is a simplified example and real-world usage would involve more sophisticated 
+analysis.
+To include comments from news articles and other data sources, you’d likely need to use web 
+scraping tools. However, it’s essential to note that scraping comments from these platforms might 
+violate their terms of service, and you should always ensure that your data collection methods 
+comply with all relevant laws and regulations.
+
+
+4.  Gauge market sentiment using NLP for a historical period – the Bidirectional Encoder 
+Representations from Transformers (BERT) option.
+One of the advanced tools for sentiment analysis in NLP is BERT, which is a transformer-based 
+machine learning technique for NLP pre-training. BERT models can consider the full context of a 
+word by looking at the words that come before and after it.
+You can use BERT for sentiment analysis with the transformers library in Python, which provides a 
+simple interface for using a range of pre-trained models.
+Here is a simple example using BERT for sentiment analysis:
+from transformers import pipeline
+
+# Initialize the sentiment analysis pipeline nlp = pipeline("sentiment-analysis")
+
+# Analyze the sentiment of a comment
+comment = "Salesforce had an incredible quarter!" result = nlp(comment)[0]
+
+# Print the result
+print(f"label: {result['label']}, with score:
+{result['score']}")
+This code would output something like the following:
+label: POSITIVE, with score: 0.9998879
+However, the pre-trained BERT model available through the transformers library might not perform 
+well on informal language or slang often found in comments. You might need to fine- tune the model 
+on a dataset of comments to get better results, which is a more involved process.
+5.  Gauge market sentiment using NLP for Salesforce by including user comments in news articles for 
+a historical period – the BERT option.
+If you have a large dataset of comments with associated sentiment labels, you could use this to 
+train your BERT model to better understand the sentiment in your specific context. This involves 
+using the transformers.Trainer and transformers.TrainingArguments classes in the transformers 
+library, and would look something like this:
+from transformers import BertForSequenceClassification, Trainer,
+TrainingArguments
+
+# Initialize a model and training arguments
+model = BertForSequenceClassification.from_pretrained("bert- base-uncased")
+training_args = TrainingArguments( output_dir='./results',    # output directory
+
+
+
+num_train_epochs=3,      # total number of training epochs
+per_device_train_batch_size=16, # batch size per device during training
+per_device_eval_batch_size=64,  # batch size for evaluation warmup_steps=500,       # number of 
+warmup steps
+for learning rate scheduler
+weight_decay=0.01,       # strength of weight decay
+
+
+)
+
+# Initialize a trainer with your model and training args trainer = Trainer(
+model=model,           # the instantiated Transformers model to be trained
+args=training_args,        # training arguments, defined above
+train_dataset=train_dataset,    # training dataset eval_dataset=test_dataset     # evaluation 
+dataset
+
+
+
+
+)
+
+# Train the model trainer.train()
+Here, train_dataset and test_dataset would be datasets of comments and their associated sentiment 
+labels. The model would learn from the labeled examples in train_ dataset, and test_dataset would 
+be used to evaluate its performance.
+Fine-tuning a BERT model like this requires a significant number of computational resources and 
+might not be feasible on a standard personal computer. You might need to use cloud computing 
+resources or a machine with a powerful GPU.
+6. Backtest your strategy using historical data. This involves applying your strategy to past data 
+and seeing how it would have performed. This can help you refine your strategy and thresholds:
+Let’s backtest this strategy using a period in Salesforce’s stock performance from Q3 2023 – Q1 
+2024 (fiscal quarters) that had significant movement due to all the changes they were experiencing 
+during that timeframe:
+import pandas as pd import numpy as np
+from sklearn.metrics import confusion_matrix, classification_ report
+
+# Data Gathering
+# Let's assume you have already gathered the financial and sentiment data
+
+
+
+# and loaded them into pandas dataframes: financial_data and sentiment_data
+
+financial_data = pd.read_csv('financial_data.csv') sentiment_data = 
+pd.read_csv('sentiment_data.csv')
+
+# Convert date columns to datetime
+financial_data['Date'] = pd.to_datetime(financial_data['Date']) sentiment_data['Date'] = 
+pd.to_datetime(sentiment_data['Date'])
+
+# Merge financial and sentiment data on date
+merged_data = pd.merge(financial_data, sentiment_data, on='Date')
+
+# Sort by date merged_data.sort_values('Date', inplace=True)
+
+# Calculate Rule of 40
+merged_data['Rule_of_40'] = merged_data['Revenue_Growth_Rate'] + merged_data['Cash_Flow_Margin']
+
+# Analyze Market Sentiment
+# Assume the sentiment analysis resulted in a sentiment score column in sentiment_data
+# We will consider a sentiment score above 0 as positive, and below 0 as negative
+
+merged_data['Sentiment'] = np.where(merged_data['Sentiment_ Score'] > 0, "Positive", "Negative")
+
+# Define your thresholds
+# Buy if Rule of 40 is above 40 and sentiment is positive
+merged_data['Buy'] = np.where((merged_data['Rule_of_40'] > 40) & (merged_data['Sentiment'] == 
+"Positive"), 1, 0)
+
+# Sell if Rule of 40 is below 30 and sentiment is negative
+merged_data['Sell'] = np.where((merged_data['Rule_of_40'] < 30) & (merged_data['Sentiment'] == 
+"Negative"), 1, 0)
+
+# Now that we have signals, let's backtest the strategy # We will start with no positions in the 
+stock
+merged_data['Position'] = np.where(merged_data['Buy'] == 1, 1,
+np.where(merged_data['Sell'] == 1, -1, 0))
+
+# The position column represents our trading signals
+
+
+# A value of 1 means we enter a long position, -1 means we exit our position
+merged_data['Position'] = merged_data['Position'].shift(). fillna(0).cumsum()
+
+# Now we can calculate the strategy returns
+merged_data['Market_Returns'] = merged_data['Close'].pct_ change()
+merged_data['Strategy_Returns'] = merged_data['Market_Returns']
+* merged_data['Position']
+
+# And the cumulative strategy returns
+merged_data['Cumulative_Market_Returns'] = (1 + merged_ data['Market_Returns']).cumprod() - 1
+merged_data['Cumulative_Strategy_Returns'] = (1 + merged_ data['Strategy_Returns']).cumprod() - 1
+# Print the cumulative strategy returns print(merged_data['Cumulative_Strategy_Returns'])
+This script creates a simple backtest that enters a long position when the buy conditions are met 
+and exits the position when the sell conditions are met. The strategy’s returns are calculated by 
+multiplying the market returns by the position at each period.
+Please make sure that you have all the necessary data and columns in the exact format described 
+previously. Modify the data loading and processing steps as necessary based on how your actual
+data is structured.
+
+Implement your strategy. Once you’re confident in your strategy, you can start to apply it in real 
+time. Monitor the Rule of 40 value and market sentiment regularly and make your buy or sell 
+decisions accordingly.
+Before we proceed, here are some important requirements that we need to follow:
+I.  This requires a data collection process where the quarterly financial data for Salesforce is 
+stored and key metrics such as revenue growth rate and cash flow margin are captured:
+pip install yfinance import yfinance as yf import pandas as pd
+def calculate_rule_of_40(ticker_symbol): ticker = yf.Ticker(ticker_symbol)
+# Get quarterly financial data
+financials_quarterly = ticker.quarterly_financials. transpose()
+# Calculate revenue growth percentage financials_quarterly['Revenue Growth'] = financials_
+quarterly['Total Revenue'].pct_change() # Calculate free cash flow margin
+financials_quarterly['Free Cash Flow'] = financials_ quarterly['Operating Cash Flow'] - 
+financials_quarterly['Capital Expenditures']
+financials_quarterly['Free Cash Flow Margin'] = financials_ quarterly['Free Cash Flow'] / 
+financials_quarterly['Total Revenue']
+# Calculate rule of 40 financials_quarterly['Rule of 40'] = financials_
+quarterly['Revenue Growth'] + financials_quarterly['Free Cash Flow Margin']
+return financials_quarterly financial_data = calculate_rule_of_40('CRM') print(financial_data)
+import requests import pandas as pd import csv
+# ... rest of the script ... # Get the data from the API
+financial_data = get_financial_data("CRM") # Calculate Rule of 40
+rule_of_40 = calculate_rule_of_40(financial_data) # Store the Rule of 40 in a CSV file
+with open('rule_of_40.csv', 'w', newline='') as file:
+writer = csv.writer(file)
+
+
+
+# Write a header row writer.writerow(['Ticker', 'Rule of 40']) # Write the Rule of 40 
+writer.writerow(["CRM", rule_of_40])
+print(f"Rule of 40 for CRM: {rule_of_40}") print("Rule of 40 saved to rule_of_40.csv")
+This Python script pulls the financial data for the specified ticker (in this case, 'CRM' for 
+Salesforce) and calculates the quarterly revenue growth, free cash flow, free cash flow margin, and 
+the rule of 40. The information is stored in a CSV file named rule_of_40.csv.
+II.  This also requires a data collection process for sentiment data based on financial news 
+articles and any additional data such as user comments. In addition, all the news articles and user 
+comments must have a sentiment score of 1 (positive), -1 (negative), or 0 (neutral) stored:
+pip install yfinance pip install requests pip install bs4
+pip install vaderSentiment import requests
+from bs4 import BeautifulSoup
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+def yahoo_finance_news(ticker):
+url = f"https://finance.yahoo.com/quote/
+{ticker}?p={ticker}&.tsrc=fin-srch" r = requests.get(url)
+soup = BeautifulSoup(r.text, 'html.parser') news_data = soup.find_all('h3', class_='Mb(5px)')
+return ['https://finance.yahoo.com'+ndata.find('a')['href'] for ndata in news_data]
+def sentiment_score(news_url):
+# Initialize the sentiment analyzer analyzer = SentimentIntensityAnalyzer() r = 
+requests.get(news_url)
+soup = BeautifulSoup(r.text, 'html.parser') paragraphs = soup.find_all('p') total_compound = 0
+for para in paragraphs:
+sentiment_dict = analyzer.polarity_scores(para.text) total_compound += sentiment_dict['compound']
+avg_compound = total_compound / len(paragraphs)
+
+
+
+# Classify the average compound score into positive, neutral or negative
+if avg_compound >= 0.05: return 1
+elif avg_compound <= -0.05: return -1
+else:
+return 0
+# Get the news article URLs
+news_urls = yahoo_finance_news('CRM')
+# Calculate sentiment score for each news article
+sentiment_scores = [sentiment_score(news_url) for news_url in news_urls]
+print(sentiment_scores) import csv
+# ... rest of the script ...
+# Calculate sentiment score for each news article
+sentiment_scores = [sentiment_score(news_url) for news_url in news_urls]
+# Open a CSV file in write mode ('w')
+with open('sentiment_scores.csv', 'w', newline='') as file: writer = csv.writer(file)
+# Write a header row
+writer.writerow(['News URL', 'Sentiment Score']) # Write the sentiment scores
+for news_url, sentiment_score in zip(news_urls, sentiment_ scores):
+writer.writerow([news_url, sentiment_score]) print("Sentiment scores saved to 
+sentiment_scores.csv")
+This script fetches the URLs of the news articles related to the specified stock symbol (in this 
+case, 'CRM' for Salesforce), fetches the text of each news article, and calculates the average 
+sentiment score of the news article using the VaderSentiment analyzer. The information is stored in 
+a CSV file named sentiment_scores.csv.
+Thresholds for buying and selling Salesforce stock are preset: the buy signal when the Rule of 40 
+calculation exceeds 40 and the sentiment score is positive (1), and the sell signal when the Rule 
+of 40 calculation is less than 30 and the sentiment score is negative (-1).
+III.  Once the financial and sentiment data is stored in CSV files and the buy and sell thresholds 
+are set, you can set up a Python script to pull this data into the Python trading script. Keep in 
+mind that you can always consider using APIs for the financial and sentiment data if the financial 
+and news websites allow it. This would be a good option if the CSV files get too large. The 
+following Python code example would need to be modified to incorporate the API option versus the 
+CSV files, but it is possible if that is your preferred method.
+
+
+This script can then be scheduled to run at regular intervals (such as every minute, every hour, or 
+whatever interval you find appropriate).
+Here is a simplified version of the Python script for implementing the trade:
+import requests import pandas as pd import numpy as np
+from datetime import datetime from time import sleep
+from your_trading_library import execute_trade
+
+# Read data from CSV files as CSV file financial_data = pd.read_csv('financial_data.csv') 
+sentiment_data = pd.read_csv('sentiment_data.csv')
+
+# Set the frequency at which the script will run (in seconds) frequency = 60
+# Set up a pandas DataFrame to store the data data = pd.DataFrame()
+while True:
+# Read financial and sentiment data from CSV files financial_data = 
+pd.read_csv(financial_data_csv_path) sentiment_data = pd.read_csv(sentiment_data_csv_path)
+
+
+
+
+
+# Check if the latest data meets the buy or sell
+conditions
+
+
+
+
+
+
+
+latest_data = data.iloc[-1]
+
+if latest_data['Rule_of_40'] > 40 and latest_ data['Sentiment'] == "Positive":
+execute_trade('Salesforce', 'buy')
+elif latest_data['Rule_of_40'] < 30 and latest_ data['Sentiment'] == "Negative":
+execute_trade('Salesforce', 'sell')
+# Wait until the next run sleep(frequency)
+In this script, execute_trade is a function from a hypothetical trading library that you might use 
+to execute your trades. Replace it with the appropriate function from the actual
+trading library you’re using.
+
+Here is the code for ActivistGPT. This represents the simple, initial stage of my thought process, 
+providing a skeletal structure for what will eventually become a more sophisticated tool:
+from apiKey import apikey from apiKey import serpapi import os
+from langchain.agents import load_tools
+from langchain.agents import initialize_agent from langchain.agents import AgentType
+from langchain.llms import OpenAI
+
+os.environ["OPENAI_API_KEY"] = apikey os.environ["SERPAPI_API_KEY"] = serpapi
+
+llm = OpenAI(temperature=0)
+
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
+agent = initialize_agent(tools,
+llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+
+agent.run("Analyze Salesforce and provide insight on areas of concern")
+
+To gain more flexibility, I will use the latest functionality from OpenAI’s API: Functions. 
+However, first, I need to write code to get the latest news about Salesforce, its balance sheet, 
+income statement, and investment multiples. I will write all of this in a text file that will serve 
+as the long-term memory of ActivistGPT:
+import os import requests import json
+from apiKey import apikey from apiKey import serpapi import yfinance as yf
+from yahooquery import Ticker
+os.environ["OPENAI_API_KEY"] = apikey
+os.environ["SERPAPI_API_KEY"] = serpapi
+
+
+
+def get_company_news(company_name): params = {
+"engine": "google",
+"tbm": "nws",
+"q": company_name,
+"api_key": os.environ["SERPAPI_API_KEY"],
+
+
+
+
+
+
+
+
+
+
+}
+
+response = requests.get('https://serpapi.com/search', params=params)
+data = response.json()
+
+return data.get('news_results')
+
+
+def write_news_to_file(news, filename): with open(filename, 'w') as file:
+for news_item in news:
+if news_item is not None:
+title = news_item.get('title', 'No title') link = news_item.get('link', 'No link') date = 
+news_item.get('date', 'No date') file.write(f"Title: {title}\n") file.write(f"Link: {link}\n") 
+file.write(f"Date: {date}\n\n")
+
+# ... (rest of the code is similar to the one provided earlier, but targeting Salesforce)
+I can then create ActivistGPT’s core function like this:
+def activist_gpt(request):
+# ... (similar to the previous code, but targeting Salesforce) # ...
+return second_response["choices"][0]["message"]["content"] while True:
+user_question = input("Enter your analysis request:\n\n")
+
+if user_question == 'exit': break
+
+print(activist_gpt(user_question))
+
+
+
+Here is the result when I ask ActivistGPT about potential areas of concern for Salesforce:
+Received request: Analyze Salesforce for potential areas of concern?
+Based on the provided data and recent news, here are some areas of concern for Salesforce:
+1.  High Operating Expenses: Salesforce’s operating expenses have been increasing at a faster rate 
+than its revenues, which could impact profitability in the long run
+2.  Dependence on Large Deals: Salesforce’s business model heavily depends on securing large deals, 
+which inherently involves a high level of risk and unpredictability
+3.  Product Complexity: Salesforce’s product A few things to note:
+•  This work would not be possible without the LangChain project. LangChain is an open source 
+project by OpenAI. Its goal is to enable developers to build AI agents that are capable of 
+interacting with humans in a conversational manner.
+•  I used Serpapi, a paid service, to perform internet searches. While it is possible to use a free 
+service such as Google’s Custom Search JSON API, I found that Serpapi provided more robust and 
+consistent results. However, please be aware that using Serpapi entails costs.
+•  I used the Yahoo Finance Python package, yfinance, and the YahooQuery Python package to gather 
+stock data and financial statements. These libraries are free to use, but it is always good 
+practice to abide by the terms of service and usage restrictions. The data provided by these 
+services is intended for personal use and should not be used for commercial purposes without 
+explicit permission.
+•  Finally, please note that this is an experimental project. The AI agent’s investment advice is 
+not reliable or comprehensive. Before making any investment decisions, it is crucial to do your 
+research or consult with a financial advisor.
+Part 2 – LangChain, ChatGPT, and Streamlit – ActivistGPT (create a frontend for the ActivistGPT 
+agent)
+We can now state that the backend of this project is already developed. The next step is to design 
+an interactive user interface to make ActivistGPT, the powerful AI financial analyst specifically 
+targeting Salesforce, accessible to everyone. While there are several options available, including 
+using a web development framework such as Flask, I’ve decided that using Streamlit would be a more 
+efficient approach to constructing my user interface.
+Streamlit is an open source Python library designed to facilitate the creation of interactive web 
+applications tailored for machine learning and data science projects. It simplifies the process of 
+developing, deploying, and sharing data-driven applications for data scientists and engineers.
+
+
+
+Streamlit’s uniqueness lies in its capacity to allow users to build interactive web applications 
+solely with Python, eliminating the need for HTML, CSS, or JavaScript. This functionality enables 
+the rapid conversion of data scripts into distributable web applications, all within the Python 
+ecosystem. Streamlit is compatible with a broad range of visualizations and is designed to 
+integrate seamlessly with many popular data science libraries such as pandas, NumPy, Matplotlib, 
+and more.
+Let’s dive in! The first order of business is to design the high-level structure of the frontend of 
+the web application. This step is crucial to conceptualize the desired outcome. For this task, I’ll 
+be using Excalidraw. As I envisage it, users will input the company name and then click the Analyze 
+button. Upon clicking Analyze, ActivistGPT will review Salesforce’s performance, plot the stock’s 
+trajectory, and offer a recommendation on whether or not to buy the stock.
+The following code uses Streamlit to accomplish this task. Please note that this code might not be 
+optimized, and you are welcome to refine it further. My objective here was to create a functional 
+prototype.
+Here is the code for the backend and frontend:
+
+def activist_gpt(request): print(f"Received request: {request}")
+response = openai.ChatCompletion.create( model="gpt-4.0-turbo",
+messages=[{
+"role":
+"user", "content":
+f"Given the user request, what is the comapany name and the company stock ticker ?: {request}?"
+}],
+functions=[{
+"name": "get_data", "description":
+"Get financial data on a specific company for investment
+
+
+purposes",
+"parameters": { "type": "object", "properties": {
+"company_name": { "type":
+"string", "description":
+"The name of the company",
+
+
+
+
+},
+"company_ticker": { "type":
+
+
+38  Salesforce Reimagined: Navigating Software and LLMs
+
+
+
+"string", "description":
+"the ticker of the stock of the company"
+},
+
+
+
+
+
+
+
+
+"period": {
+"type": "string",
+"description": "The period of analysis"
+
+
+},
+"filename": {
+"type": "string",
+"description": "the filename to store data"
+
+},
+
+
+
+"required": ["company_name", "company_ticker"],
+},
+}],
+
+
+
+function_call={"name": "get_data"},
+)
+
+
+
+... Frontend
+# Similarly, in the frontend script, we replace `financial_analyst` with `activist_gpt`.
+
+import streamlit as st
+import matplotlib.pyplot as plt
+from backend import activist_gpt # Here, 'backend' should be replaced with the actual name of your 
+backend script
+
+def main():
+st.title("ActivistGPT App")
+
+company_name = st.text_input("Company name:", "Salesforce") analyze_button = st.button("Analyze")
+
+if analyze_button: if company_name:
+st.write("Analyzing... Please wait.") investment_thesis, hist = activist_gpt(company_name)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dataframe
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Select 'Open' and 'Close' columns from the hist hist_selected = hist[['Open', 'Close']]
+
+
+# Create a new figure in matplotlib fig, ax = plt.subplots()
+
+# Plot the selected data hist_selected.plot(kind='line', ax=ax)
+
+# Set the title and labels ax.set_title(f"{company_name} Stock Price") ax.set_xlabel("Date")
+ax.set_ylabel("Stock Price")
+# Display the plot in Streamlit st.pyplot(fig)
+st.write("Investment Thesis / Recommendation:")
+
+st.markdown(investment_thesis, unsafe_allow_html=True) else:
+st.write("Please enter the company name.")
+if  name  == " main ": main()
+In the frontend, we have pre-filled the text input field with Salesforce to reflect the specific 
+use case of ActivistGPT. However, you can choose to leave this field empty, allowing users to 
+analyze any company. You can also make any other customizations to tailor the application to your 
+needs. This is the power and flexibility of using Streamlit and OpenAI together to create an 
+AI-powered web application.
+
+
+
+
