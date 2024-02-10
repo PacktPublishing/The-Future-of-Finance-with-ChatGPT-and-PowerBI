@@ -1,0 +1,79 @@
+This example demonstrates the essence of a quantitative mean reversion strategy. It’s important to 
+note that, in reality, implementing such a strategy requires sophisticated programming and 
+statistical skills, as well as careful risk management. Price deviations can occur for valid 
+reasons, and prices can deviate from their averages for extended periods.
+Here are the steps, along with the corresponding Python code, to build the quantitative trading 
+strategy we’ve just described. We will be using the yfinance library to fetch data from Yahoo! 
+Finance and pandas for data manipulation:
+1. Data gathering: We’ll use the yfinance library to gather historical price data for the specified 
+stocks:
+import yfinance as yf
+import pandas as pd
+
+
+WallStreetGPT – revolutionizing earnings calls, one AI-driven question at a time
+as a Wall Street analyst for John Deere – Q&A with management  13
+
+
+
+
+# Define the tickers of the stocks we're interested in tickers = ['DE', 'CAT', 'CNHI']
+
+# Get the historical price data for the last 5 years
+data = yf.download(tickers, start="2018-06-23", end="2023-06- 23")['Close']
+2. Calculate the mean: Next, we calculate a 30-day moving average for each stock:
+# Calculate 30-day moving average moving_averages = data.rolling(window=30).mean()
+3.  Identify deviations: We calculate the standard deviation and identify points where the price of 
+John Deere deviates by more than two standard deviations from its moving average:
+# Calculate 30-day standard deviation std_dev = data.rolling(window=30).std()
+
+# Identify points where price of John Deere deviates by more than 2 standard deviations from its 
+moving average
+deviations = (data['DE'] - moving_averages['DE']).abs() > 2*std_ dev['DE']
+
+4. Confirm correlation: We check that the prices of Caterpillar and CNH Industrial are not 
+deviating from their averages when John Deere’s price is deviating from its average:
+# Identify points where prices of CAT and CNHI are not deviating by more than 2 standard deviations 
+from their moving averages
+not_dev_cat = (data['CAT'] - moving_averages['CAT']).abs() <= 2*std_dev['CAT']
+not_dev_cnh = (data['CNHI'] - moving_averages['CNHI']).abs() <= 2*std_dev['CNHI']
+
+# Confirm the correlation
+correlated_dev = deviations & not_dev_cat & not_dev_cnh
+
+5.  Execution of trades: We generate trading signals based on our observations. We’ll mark 1 as a 
+buy signal when John Deere’s stock is significantly below its average and -1 as a sell signal when 
+it’s significantly above its average:
+# Identify buy/sell signals
+signals = pd.Series(index=data.index)
+signals[correlated_dev & (data['DE'] < moving_averages['DE'])] =
+1 # Buy signal
+signals[correlated_dev & (data['DE'] > moving_averages['DE'])] =
+-1 # Sell signal
+
+14  John Deere’s AgTech Revolution – AI Insights and Challenges
+
+
+6.  Close the position: In a real-world scenario, you would close your position when the price 
+reverts to the mean. However, for our simplified example, we won’t cover the closing of positions.
+Please note that this example is a simple illustration and doesn’t take into account many factors 
+you should consider in a real trading scenario, such as transaction costs, slippage, risk 
+management, and more. Additionally, note that this example assumes the availability of the 
+short-selling facility, which may not be available under all circumstances. Finally, the trading 
+strategy is based on the assumption that prices will revert to the mean, which might not always 
+hold true in real-world scenarios. Always perform thorough backtesting before deploying any 
+strategy.
+Python code snippet explanation
+•  Data gathering: We downloaded historical price data for John Deere, Caterpillar Inc., and CNH 
+Industrial for the past 5 years from Yahoo! Finance using the yfinance library.
+•  Calculate the mean: A 30-day moving average for each stock was calculated using the pandas
+.rolling().mean() method.
+•  Identify deviations: Deviations were identified by calculating the standard deviation and 
+looking for instances where John Deere’s stock price deviated by more than two standard deviations 
+from its moving average.
+•  Confirm correlation: We confirmed correlation by checking that Caterpillar and CNH Industrial’s 
+prices were not deviating from their respective averages when John Deere’s price was deviating from 
+its average.
+• Execution of trades: Trading signals were generated based on our findings. 1 was marked as a buy 
+signal when John Deere’s stock was significantly below its average, and -1 was marked
+as a sell signal when it was significantly above its average.
