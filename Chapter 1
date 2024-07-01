@@ -207,63 +207,92 @@ the SEC data.
 The SEC reports for instructions on how to access and store the 10-Q reports using sec-api and 
 Python for Palo Alto Networks (non-technical user step-by-step instructions) are required, since 
 the ChatGPT model only includes information up to September 2021. Follow these steps:
+
+UPDATE v1.1.: xrbl_files definition provided in Python code below
+
 1. Open a command prompt or terminal window on your computer.
 2. Install the sec-api package by running the following command:
 pip install sec-api==1.0.16
 3.  Open a code editor or IDE of your choice, and create a new file named sec_api_example.py.
 4.  Copy and paste the following code into the new Python file that we just created:
-import requests import json import re
-from xbrl import XBRLParser url = "https://api.sec-api.io" query = {
-"query": {
-"query_string": {
-"query": "ticker:PANW AND formType:10-Q AND filedAt:{2021-09-01 TO 2023-03-31}"
+
+import requests
+import json
+import re
+from xbrl import XBRLParser
+
+# Define the list of XBRL files 
+xbrl_files = [
+    'file1.xbrl',
+    'file2.xbrl',
+    'file3.xbrl',
+    # Add more files as needed
+]
+
+# Define the list of text files 
+text_files = [
+    'file1.txt',
+    'file2.txt',
+    'file3.txt',
+    # Add more files as needed
+]
+
+url = "https://api.sec-api.io"
+query = {
+    "query": {
+        "query_string": {
+            "query": "ticker:PANW AND formType:10-Q AND filedAt:{2021-09-01 TO 2023-03-31}"
+        }
+    },
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}]
 }
-
-
-},
-"from": "0",
-"size": "10",
-"sort": [{"filedAt": {"order": "desc"}}]
-}
-
 
 api_key = "YOUR_API_KEY"
 response = requests.post(url, json=query, headers={"Authorization": api_key})
 filings = json.loads(response.content)
-with open("panw_10q_filings.json", "w") as outfile: json.dump(filings, outfile)
+
+with open("panw_10q_filings.json", "w") as outfile:
+    json.dump(filings, outfile)
 
 print("10-Q filings for Palo Alto Networks have been saved to panw_10q_filings.json")
 
-revenue_xbrl = [] net_income_xbrl = [] eps_xbrl = []
+revenue_xbrl = []
+net_income_xbrl = []
+eps_xbrl = []
 
-for xbrl_file in xbrl_files: xbrl_parser = XBRLParser()
+for xbrl_file in xbrl_files:
+    xbrl_parser = XBRLParser()
+    xbrl = xbrl_parser.parse(open(xbrl_file))
+    revenue_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:Revenues'))
+    net_income_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:NetIncomeLoss'))
+    eps_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:EarningsPerShare'))
 
-
-xbrl = xbrl_parser.parse(open(xbrl_file)) revenue_xbrl.append(xbrl_parser.extract_value(xbrl,
-'us-gaap:Revenues'))
-net_income_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:NetIncomeLoss'))
-eps_xbrl.append(xbrl_parser.extract_value(xbrl, 'us-gaap:EarningsPerShare'))
-
-revenue_text = [] net_income_text = [] eps_text = []
+revenue_text = []
+net_income_text = []
+eps_text = []
 
 for text_file in text_files:
-with open(text_file, 'r') as f: content = f.read()
-revenue_text.append(re.search('Revenue\s+(\d+)', content). group(1))
-net_income_text.append(re.search('Net Income\s+(\d+)', content).group(1))
-eps_text.append(re.search('Earnings Per Share\s+(\d+.\d+)', content).group(1))
+    with open(text_file, 'r') as f:
+        content = f.read()
+    revenue_text.append(re.search(r'Revenue\s+(\d+)', content).group(1))
+    net_income_text.append(re.search(r'Net Income\s+(\d+)', content).group(1))
+    eps_text.append(re.search(r'Earnings Per Share\s+(\d+\.\d+)', content).group(1))
 
 data = {
-'revenue_xbrl': revenue_xbrl, 'net_income_xbrl': net_income_xbrl, 'eps_xbrl': eps_xbrl, 
-'revenue_text': revenue_text, 'net_income_text': net_income_text, 'eps_text': eps_text
-
-
-
-
+    'revenue_xbrl': revenue_xbrl,
+    'net_income_xbrl': net_income_xbrl,
+    'eps_xbrl': eps_xbrl,
+    'revenue_text': revenue_text,
+    'net_income_text': net_income_text,
+    'eps_text': eps_text
 }
 
-with open('financial_metrics.json', 'w') as f: json.dump(data, f)
+with open('financial_metrics.json', 'w') as f:
+    json.dump(data, f)
 
-print("Extracted financial metrics have been saved to financial_ metrics.json")
+print("Extracted financial metrics have been saved to financial_metrics.json")
 
 5.  Run the Python script file:
 python sec_api_example.py
@@ -272,29 +301,32 @@ September, 2021 and 31 March 31, 2023, from the SEC API, with the results saved 
 Here’s a step-by-step explanation of the code:
 
 Fetch 10-Q filings:
+1.	Import the requests library to make HTTP requests and the json library to handle JSON data.
+2.	Define the API endpoint URL and the query parameters. The query dictionary specifies the search criteria.
+3.	Define your SEC API key by replacing "YOUR_API_KEY" with your actual API key.
+4.	Make a POST request to the SEC API using requests.post(), with the specified URL, query parameters, and API key as headers.
+5.	Parse the response content using json.loads(), and store it in the filings variable.
+6.	Save the filings data to a JSON file named "panw_10q_filings.json" using json.dump().
+7.	Print a confirmation message.
 
-1.  Import the requests library to make HTTP requests and the json library to handle JSON data.
-2. Define the API endpoint URL and the query parameters. The query dictionary specifies the search 
-criteria.
-3.  Define your SEC API key by replacing "YOUR_API_KEY" with your actual API key.
-4.  Make a POST request to the SEC API using requests.post(), with the specified URL, query 
-parameters, and API key as headers.
-5.  Parse the response content using json.loads(), and store it in the filings variable.
-6.  Save the filings data to a JSON file named "panw_10q_filings.json" using json. dump().
-7. Print a confirmation message.
 Extract the metrics from XBRL files:
-1. Import the XBRLParser class from the xbrl library.
-2.  Initialize empty lists to store revenue, net income, and EPS metrics.
-3.  Loop through each XBRL file (assumed to be in a list named xbrl_files).
-4. Use the XBRLParser to parse the XBRL file and extract the required financial metrics.
-5. Append the extracted metrics to the lists initialized earlier.
+1.	Import the XBRLParser class from the xbrl library.
+2.	Initialize empty lists to store revenue, net income, and EPS metrics.
+3.	Define the list of XBRL files (xbrl_files).
+4.	Loop through each XBRL file in xbrl_files.
+5.	Use the XBRLParser to parse the XBRL file and extract the required financial metrics.
+6.	Append the extracted metrics to the lists initialized earlier.
+
 Extract the metrics from the text files:
-1. Import the re (regular expressions) library.
-2.  Initialize empty lists to store revenue, net income, and EPS metrics.
-3.  Loop through each text file (assumed to be in a list named text_files).
-4.  Use regular expressions to extract the required financial metrics from the text content.
-5. Append the extracted metrics to the lists initialized earlier.
+1.	Import the re (regular expressions) library.
+2.	Initialize empty lists to store revenue, net income, and EPS metrics.
+3.	Define the list of text files (text_files).
+4.	Loop through each text file in text_files.
+5.	Use regular expressions to extract the required financial metrics from the text content.
+6.	Append the extracted metrics to the lists initialized earlier.
+
 Save the extracted metrics to a JSON file:
-1.  Create a dictionary to store all the extracted metrics.
-2.  Save this dictionary as a JSON file named 'financial_metrics.json', using json. dump().
-3. Print a confirmation message.Chapter-1
+1.	Create a dictionary to store all the extracted metrics.
+2.	Save this dictionary as a JSON file named 'financial_metrics.json', using json.dump().
+3.	Print a confirmation message.
+
